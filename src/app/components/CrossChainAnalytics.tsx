@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { timeSeriesStore } from '../lib/time-series-store';
 
 interface IBCTransfer {
   id: string;
@@ -31,13 +30,10 @@ interface CrossChainAnalyticsProps {
 export default function CrossChainAnalytics({
   isMinimized = false,
   isMaximized = false,
-  onMinimize,
-  onMaximize
+  onMinimize
 }: CrossChainAnalyticsProps) {
   const [ibcTransfers, setIbcTransfers] = useState<IBCTransfer[]>([]);
   const [bridgeActivity, setBridgeActivity] = useState<BridgeActivity[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [selectedTimeframe, setSelectedTimeframe] = useState<'1h' | '24h' | '7d' | '30d'>('24h');
 
   // Mock data for demonstration - in real implementation, this would come from IBC APIs
@@ -68,7 +64,6 @@ export default function CrossChainAnalytics({
 
       setIbcTransfers(mockTransfers);
       setBridgeActivity(mockBridgeActivity);
-      setLoading(false);
     };
 
     generateMockData();
@@ -168,7 +163,7 @@ export default function CrossChainAnalytics({
             <label className="text-black text-sm font-bold">Timeframe:</label>
             <select
               value={selectedTimeframe}
-              onChange={(e) => setSelectedTimeframe(e.target.value as any)}
+              onChange={(e) => setSelectedTimeframe(e.target.value as '1h' | '24h' | '7d' | '30d')}
               className="win95-select"
             >
               <option value="1h">Last Hour</option>
@@ -184,7 +179,7 @@ export default function CrossChainAnalytics({
           <div className="win95-window-inset p-4">
             <h3 className="text-lg font-bold text-black mb-4">Bridge Activity</h3>
             <div className="space-y-3">
-              {bridgeActivity.map((bridge, index) => (
+              {bridgeActivity.map((bridge) => (
                 <div key={bridge.chain} className="flex items-center justify-between p-3 bg-white border border-gray-300">
                   <div className="flex items-center space-x-3">
                     <div className="w-3 h-3 bg-green-500 rounded-full"></div>

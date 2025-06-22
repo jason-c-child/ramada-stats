@@ -76,8 +76,7 @@ interface NetworkData {
 export default function AlertSystem({
   isMinimized = false,
   isMaximized = false,
-  onMinimize,
-  onMaximize
+  onMinimize
 }: AlertSystemProps) {
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [showCreateForm, setShowCreateForm] = useState(false);
@@ -334,77 +333,78 @@ export default function AlertSystem({
     }
   };
 
-  const checkAlerts = async () => {
-    if (isChecking || alerts.filter(a => a.enabled).length === 0) return;
-
+  const checkAlerts = useCallback(async () => {
+    if (isChecking) return;
+    
     setIsChecking(true);
-    setLastCheckTime(new Date());
-
     try {
       const data = await fetchNetworkData();
-      const triggeredAlerts: AlertTrigger[] = [];
-
+      const currentTime = Date.now();
+      
       for (const alert of alerts.filter(a => a.enabled)) {
         const currentValue = getCurrentValue(alert, data);
         if (currentValue === null) continue;
-
+        
         const lastValue = lastValuesRef.current[alert.id];
         const shouldTrigger = checkAlertCondition(alert, currentValue, lastValue);
-
-        if (shouldTrigger) {
+        
+        // Check cooldown
+        const cooldownMs = (alert.cooldown || 5) * 60 * 1000;
+        const canTrigger = !alert.lastTriggered || (currentTime - alert.lastTriggered) > cooldownMs;
+        
+        if (shouldTrigger && canTrigger) {
           const trigger: AlertTrigger = {
-            id: `trigger-${Date.now()}-${alert.id}`,
+            id: `trigger-${Date.now()}-${Math.random()}`,
             alertId: alert.id,
             alertName: alert.name,
-            message: `${alert.name}: ${alert.type.replace('-', ' ')} is ${alert.condition} ${alert.threshold} (Current: ${currentValue})`,
+            message: `${alert.name}: ${currentValue} ${alert.condition} ${alert.threshold}`,
             value: currentValue,
             threshold: alert.threshold,
             condition: alert.condition,
-            timestamp: Date.now(),
+            timestamp: currentTime,
             notificationSent: false
           };
-
-          triggeredAlerts.push(trigger);
-
-          // Update alert with trigger info
-          setAlerts(prev => prev.map(a => 
-            a.id === alert.id ? {
-              ...a,
-              lastTriggered: Date.now(),
-              lastValue: currentValue,
-              triggerCount: a.triggerCount + 1
-            } : a
-          ));
-
-          // Send notifications
-          if (alert.notificationMethod === 'webhook') {
-            const webhookSuccess = await sendWebhookNotification(alert, trigger);
-            trigger.notificationSent = webhookSuccess;
-          } else if (alert.notificationMethod === 'browser') {
-            console.log(`Sending browser notification for alert: ${alert.name}`);
+          
+          // Send notification
+          let notificationSent = false;
+          if (alert.notificationMethod === 'webhook' && alert.webhookUrl) {
+            notificationSent = await sendWebhookNotification(alert, trigger);
+          } else {
             sendBrowserNotification(alert, trigger);
-            trigger.notificationSent = true;
-            console.log(`Browser notification sent for alert: ${alert.name}`);
+            notificationSent = true;
           }
-
-          // Add to notifications list
-          addNotification(trigger.message, 'warning');
+          
+          trigger.notificationSent = notificationSent;
+          
+          // Update alert
+          const updatedAlert = {
+            ...alert,
+            lastTriggered: currentTime,
+            lastValue: currentValue,
+            triggerCount: alert.triggerCount + 1
+          };
+          
+          setAlerts(prev => prev.map(a => a.id === alert.id ? updatedAlert : a));
+          setAlertTriggers(prev => [trigger, ...prev]);
+          setWebhookStatus(prev => ({ ...prev, [alert.id]: notificationSent ? 'success' : 'error' }));
+          
+          addNotification(
+            `Alert triggered: ${alert.name}`,
+            notificationSent ? 'success' : 'error'
+          );
         }
-
-        // Update last value for change detection
+        
         lastValuesRef.current[alert.id] = currentValue;
       }
-
-      if (triggeredAlerts.length > 0) {
-        setAlertTriggers(prev => [...triggeredAlerts, ...prev].slice(0, 100)); // Keep last 100 triggers
-      }
+      
+      setLastCheckTime(new Date());
     } catch (error) {
       console.error('Error checking alerts:', error);
-      addNotification('Error checking alerts: ' + (error as Error).message, 'error');
+      addNotification('Error checking alerts', 'error');
     } finally {
       setIsChecking(false);
     }
-  };
+  }, [alerts, isChecking]);
 
   // Start alert checking interval
   useEffect(() => {
@@ -1110,15 +1110,15 @@ export default function AlertSystem({
             <div>
               <strong>How to enable notifications:</strong>
               <ul className="list-disc list-inside mt-1 ml-4">
-                <li>Click "Enable Notifications" button above</li>
+                <li>Click &quot;Enable Notifications&quot; button above</li>
                 <li>Allow notifications when prompted by your browser</li>
-                <li>Use the "Test Notification" button to verify it's working</li>
+                <li>Use the &quot;Test Notification&quot; button to verify it&apos;s working</li>
               </ul>
             </div>
             <div>
-              <strong>If notifications aren't working:</strong>
+              <strong>If notifications aren&apos;t working:</strong>
               <ul className="list-disc list-inside mt-1 ml-4">
-                <li>Check your browser's notification settings</li>
+                <li>Check your browser&apos;s notification settings</li>
                 <li>Make sure the site is not blocked in your browser</li>
                 <li>Try refreshing the page after enabling notifications</li>
                 <li>Check the browser console for error messages</li>

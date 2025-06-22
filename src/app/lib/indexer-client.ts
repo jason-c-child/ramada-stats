@@ -157,12 +157,6 @@ class NamadaIndexerClient {
   }
 
   private getValidatorName(): string {
-    // This would ideally come from a validator registry or API
-    // For now, we'll use a simple mapping or truncate the address
-    const knownValidators: { [key: string]: string } = {
-      // Add known validator names here
-    };
-    
     return 'Validator';
   }
 

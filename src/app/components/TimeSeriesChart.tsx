@@ -13,6 +13,7 @@ import {
   Filler,
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
+import 'chartjs-adapter-date-fns';
 
 ChartJS.register(
   CategoryScale,
@@ -205,7 +206,6 @@ export default function TimeSeriesChart({
         pointBackgroundColor: '#ff6b6b',
         pointBorderColor: '#000',
         pointBorderWidth: 1,
-        borderDash: [5, 5],
       });
     }
 
@@ -224,7 +224,6 @@ export default function TimeSeriesChart({
         pointBackgroundColor: '#4ecdc4',
         pointBorderColor: '#000',
         pointBorderWidth: 1,
-        borderDash: [10, 5],
       });
     }
 
@@ -256,7 +255,7 @@ export default function TimeSeriesChart({
         color: '#000',
         font: {
           size: 16,
-          weight: 'bold',
+          weight: 'bold' as const,
         },
       },
       tooltip: {
@@ -266,8 +265,8 @@ export default function TimeSeriesChart({
         borderColor: '#000',
         borderWidth: 1,
         callbacks: {
-          label: function(context: { dataset: { label: string }; parsed: { y: number } }) {
-            return `${context.dataset.label}: ${formatValue(context.parsed.y)}`;
+          label: function(tooltipItem: any) {
+            return `${tooltipItem.dataset.label}: ${formatValue(tooltipItem.parsed.y)}`;
           },
         },
       },
@@ -300,8 +299,8 @@ export default function TimeSeriesChart({
           font: {
             size: 10,
           },
-          callback: function(value: number) {
-            return formatValue(value);
+          callback: function(value: string | number) {
+            return formatValue(Number(value));
           },
         },
         title: {
@@ -310,7 +309,7 @@ export default function TimeSeriesChart({
           color: '#000',
           font: {
             size: 12,
-            weight: 'bold',
+            weight: 'bold' as const,
           },
         },
       },
@@ -321,7 +320,7 @@ export default function TimeSeriesChart({
     },
   };
 
-  const handleChartRef = useCallback((chart: ChartJS | null) => {
+  const handleChartRef = useCallback((chart: any) => {
     console.log('TimeSeriesChart: Chart ref callback called for', title, 'with chart:', chart);
     if (chart) {
       chartRef.current = chart;

@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useRef, useCallback } from 'react';
+import React, { useRef, useMemo, useCallback } from 'react';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -10,6 +10,7 @@ import {
   Tooltip,
   Legend,
   TimeScale,
+  TooltipItem,
 } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
 import 'chartjs-adapter-date-fns';
@@ -27,15 +28,16 @@ ChartJS.register(
 interface CombinedVotingPowerChartProps {
   totalVotingPower: { timestamp: number; value: number }[];
   averageVotingPower: { timestamp: number; value: number }[];
-  onChartReady?: (chart: any) => void;
+  onChartReady?: (chart: ChartJS<'bar'>) => void;
 }
+
 
 export default function CombinedVotingPowerChart({ 
   totalVotingPower, 
   averageVotingPower,
   onChartReady
 }: CombinedVotingPowerChartProps) {
-  const chartRef = useRef<any>(null);
+  const chartRef = useRef<ChartJS<'bar'> | null>(null);
   
   console.log('CombinedVotingPowerChart received data:', { 
     totalVotingPower: totalVotingPower.length, 
@@ -117,10 +119,7 @@ export default function CombinedVotingPowerChart({
       datasets: [
         {
           label: 'Average Voting Power',
-          data: averageVotingPowerData.map(point => ({
-            x: new Date(point.timestamp),
-            y: point.value
-          })),
+          data: averageVotingPowerData.map(point => point.value),
           backgroundColor: '#ff8000',
           borderColor: '#ff8000',
           borderWidth: 1,
@@ -131,10 +130,7 @@ export default function CombinedVotingPowerChart({
           data: totalVotingPowerData.map((point, index) => {
             const avgPoint = averageVotingPowerData[index];
             const additional = avgPoint ? point.value - avgPoint.value : 0;
-            return {
-              x: new Date(point.timestamp),
-              y: Math.max(0, additional)
-            };
+            return Math.max(0, additional);
           }),
           backgroundColor: '#800080',
           borderColor: '#800080',
@@ -159,7 +155,7 @@ export default function CombinedVotingPowerChart({
           color: '#000',
           font: {
             size: 12,
-            weight: 'bold',
+            weight: 'bold' as const,
           },
           usePointStyle: true,
           pointStyle: 'rect',
@@ -171,7 +167,7 @@ export default function CombinedVotingPowerChart({
         color: '#000',
         font: {
           size: 16,
-          weight: 'bold',
+          weight: 'bold' as const,
         },
       },
       tooltip: {
@@ -181,7 +177,7 @@ export default function CombinedVotingPowerChart({
         borderColor: '#000',
         borderWidth: 1,
         callbacks: {
-          label: function(context: any) {
+          label: function(context: TooltipItem<'bar'>) {
             return `${context.dataset.label}: ${formatVotingPower(context.parsed.y)}`;
           },
         },
@@ -223,8 +219,8 @@ export default function CombinedVotingPowerChart({
           font: {
             size: 10,
           },
-          callback: function(value: any) {
-            return formatVotingPower(value);
+          callback: function(value: string | number) {
+            return formatVotingPower(Number(value));
           },
         },
         title: {
@@ -233,7 +229,7 @@ export default function CombinedVotingPowerChart({
           color: '#000',
           font: {
             size: 12,
-            weight: 'bold',
+            weight: 'bold' as const,
           },
         },
       },

@@ -173,7 +173,7 @@ export async function GET(request: NextRequest) {
         return getNetworkNodes(searchParams);
       
       case 'flow-metrics':
-        return getFlowMetrics(searchParams);
+        return getFlowMetrics();
       
       case 'flow-details':
         return getFlowDetails(searchParams);
@@ -572,7 +572,7 @@ async function getNetworkNodes(searchParams: URLSearchParams) {
   });
 }
 
-async function getFlowMetrics(searchParams: URLSearchParams) {
+async function getFlowMetrics() {
   // Mock metrics data
   const mockMetrics = {
     totalTransfers: 1250,

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Line } from 'react-chartjs-2';
+import 'chartjs-adapter-date-fns';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -46,14 +47,12 @@ interface PrivacyMetricsProps {
   isMinimized?: boolean;
   isMaximized?: boolean;
   onMinimize?: () => void;
-  onMaximize?: () => void;
 }
 
 export default function PrivacyMetrics({
   isMinimized = false,
   isMaximized = false,
-  onMinimize,
-  onMaximize
+  onMinimize
 }: PrivacyMetricsProps) {
   const [maspStats, setMaspStats] = useState<MASPStats>({
     totalShieldedBalance: 0,
@@ -65,8 +64,6 @@ export default function PrivacyMetrics({
   });
   const [privacyTransactions, setPrivacyTransactions] = useState<PrivacyTransaction[]>([]);
   const [anonymitySetHistory, setAnonymitySetHistory] = useState<{ timestamp: number; value: number }[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [selectedTimeframe, setSelectedTimeframe] = useState<'1h' | '24h' | '7d' | '30d'>('24h');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTransactionType, setSelectedTransactionType] = useState<'all' | 'shield' | 'unshield' | 'transfer'>('all');
@@ -107,7 +104,6 @@ export default function PrivacyMetrics({
       setMaspStats(mockMaspStats);
       setPrivacyTransactions(mockTransactions);
       setAnonymitySetHistory(mockAnonymityHistory);
-      setLoading(false);
     };
 
     generateMockData();
@@ -183,7 +179,7 @@ export default function PrivacyMetrics({
         color: '#000',
         font: {
           size: 16,
-          weight: 'bold',
+          weight: 'bold' as const,
         },
       },
       tooltip: {
@@ -193,7 +189,7 @@ export default function PrivacyMetrics({
         borderColor: '#000',
         borderWidth: 1,
         callbacks: {
-          label: function(context: any) {
+          label: function(context: { parsed: { y: number } }) {
             return `Anonymity Set: ${formatNumber(context.parsed.y)} addresses`;
           },
         },
@@ -224,8 +220,8 @@ export default function PrivacyMetrics({
           font: {
             size: 10,
           },
-          callback: function(value: any) {
-            return formatNumber(value);
+          callback: function(value: string | number) {
+            return formatNumber(Number(value));
           },
         },
         title: {
@@ -234,7 +230,7 @@ export default function PrivacyMetrics({
           color: '#000',
           font: {
             size: 12,
-            weight: 'bold',
+            weight: 'bold' as const,
           },
         },
       },
@@ -308,7 +304,7 @@ export default function PrivacyMetrics({
               <label className="text-black text-sm font-bold mb-2">Timeframe:</label>
               <select
                 value={selectedTimeframe}
-                onChange={(e) => setSelectedTimeframe(e.target.value as any)}
+                onChange={(e) => setSelectedTimeframe(e.target.value as '1h' | '24h' | '7d' | '30d')}
                 className="win95-select w-full"
               >
                 <option value="1h">Last Hour</option>
@@ -331,7 +327,7 @@ export default function PrivacyMetrics({
               <label className="text-black text-sm font-bold mb-2">Transaction Type:</label>
               <select
                 value={selectedTransactionType}
-                onChange={(e) => setSelectedTransactionType(e.target.value as any)}
+                onChange={(e) => setSelectedTransactionType(e.target.value as 'all' | 'shield' | 'unshield' | 'transfer')}
                 className="win95-select w-full"
               >
                 <option value="all">All Types</option>

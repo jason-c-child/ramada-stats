@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 
 interface TransferFlow {
   id: string;
@@ -132,13 +132,7 @@ export default function TransferFlowNetwork({
     successRate: 94.2
   });
 
-  useEffect(() => {
-    if (canvasRef.current && activeTab === 'network') {
-      drawNetworkGraph();
-    }
-  }, [activeTab, selectedTimeframe, drawNetworkGraph]);
-
-  const drawNetworkGraph = () => {
+  const drawNetworkGraph = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -195,7 +189,13 @@ export default function TransferFlowNetwork({
       ctx.lineTo(x2 - 30, y2);
       ctx.stroke();
     }
-  };
+  }, [networkNodes]);
+
+  useEffect(() => {
+    if (canvasRef.current && activeTab === 'network') {
+      drawNetworkGraph();
+    }
+  }, [activeTab, selectedTimeframe, drawNetworkGraph]);
 
   const getStatusColor = (status: string) => {
     switch (status) {

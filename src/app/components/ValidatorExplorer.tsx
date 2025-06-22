@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { indexerClient, ValidatorStats } from '../lib/indexer-client';
+import { indexerClient } from '../lib/indexer-client';
 
 interface Validator {
   address: string;
@@ -20,14 +20,12 @@ interface ValidatorExplorerProps {
   isMinimized?: boolean;
   isMaximized?: boolean;
   onMinimize?: () => void;
-  onMaximize?: () => void;
 }
 
 export default function ValidatorExplorer({
   isMinimized = false,
   isMaximized = false,
-  onMinimize,
-  onMaximize
+  onMinimize
 }: ValidatorExplorerProps) {
   const [validators, setValidators] = useState<Validator[]>([]);
   const [loading, setLoading] = useState(true);
@@ -180,7 +178,7 @@ export default function ValidatorExplorer({
               <label className="block text-black text-sm font-bold mb-2">Sort By</label>
               <select
                 value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as any)}
+                onChange={(e) => setSortBy(e.target.value as 'voting_power' | 'name' | 'commission')}
                 className="win95-select"
               >
                 <option value="voting_power">Voting Power</option>
@@ -192,7 +190,7 @@ export default function ValidatorExplorer({
               <label className="block text-black text-sm font-bold mb-2">Order</label>
               <select
                 value={sortOrder}
-                onChange={(e) => setSortOrder(e.target.value as any)}
+                onChange={(e) => setSortOrder(e.target.value as 'asc' | 'desc')}
                 className="win95-select"
               >
                 <option value="desc">Descending</option>
@@ -249,7 +247,7 @@ export default function ValidatorExplorer({
                   </tr>
                 </thead>
                 <tbody>
-                  {sortedValidators.slice(0, 50).map((validator, index) => (
+                  {sortedValidators.slice(0, 50).map((validator) => (
                     <tr key={validator.address} className="hover:bg-gray-100">
                       <td>
                         <div>

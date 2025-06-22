@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useRef, useCallback } from 'react';
+import React, { useRef, useMemo, useCallback } from 'react';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -11,6 +11,7 @@ import {
   Tooltip,
   Legend,
   TimeScale,
+  TooltipItem,
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import 'chartjs-adapter-date-fns';
@@ -29,7 +30,7 @@ ChartJS.register(
 interface NetworkHealthChartProps {
   blockTime: { timestamp: number; value: number }[];
   activeValidators: { timestamp: number; value: number }[];
-  onChartReady?: (chart: any) => void;
+  onChartReady?: (chart: ChartJS<'line'>) => void;
 }
 
 export default function NetworkHealthChart({ 
@@ -37,7 +38,7 @@ export default function NetworkHealthChart({
   activeValidators,
   onChartReady
 }: NetworkHealthChartProps) {
-  const chartRef = useRef<any>(null);
+  const chartRef = useRef<ChartJS<'line'> | null>(null);
   
   console.log('NetworkHealthChart received data:', { 
     blockTime: blockTime.length, 
@@ -144,7 +145,7 @@ export default function NetworkHealthChart({
           color: '#000',
           font: {
             size: 12,
-            weight: 'bold',
+            weight: 'bold' as const,
           },
           usePointStyle: true,
           pointStyle: 'circle',
@@ -156,7 +157,7 @@ export default function NetworkHealthChart({
         color: '#000',
         font: {
           size: 16,
-          weight: 'bold',
+          weight: 'bold' as const,
         },
       },
       tooltip: {
@@ -166,7 +167,7 @@ export default function NetworkHealthChart({
         borderColor: '#000',
         borderWidth: 1,
         callbacks: {
-          label: function(context: any) {
+          label: function(context: TooltipItem<'line'>) {
             if (context.dataset.label === 'Block Time (seconds)') {
               return `${context.dataset.label}: ${context.parsed.y.toFixed(2)}s`;
             } else {
@@ -214,8 +215,8 @@ export default function NetworkHealthChart({
           font: {
             size: 10,
           },
-          callback: function(value: any) {
-            return `${value.toFixed(2)}s`;
+          callback: function(value: string | number) {
+            return `${Number(value).toFixed(2)}s`;
           },
         },
         title: {
@@ -224,7 +225,7 @@ export default function NetworkHealthChart({
           color: '#ff0000',
           font: {
             size: 12,
-            weight: 'bold',
+            weight: 'bold' as const,
           },
         },
       },
@@ -249,7 +250,7 @@ export default function NetworkHealthChart({
           color: '#00ff00',
           font: {
             size: 12,
-            weight: 'bold',
+            weight: 'bold' as const,
           },
         },
       },

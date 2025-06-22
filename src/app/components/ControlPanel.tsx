@@ -31,8 +31,8 @@ export default function ControlPanel({
       localStorage.removeItem('namada-time-series-data');
       localStorage.removeItem('namada-time-series-config');
       // Also clear the in-memory store
-      if (window.timeSeriesStore) {
-        window.timeSeriesStore.clear();
+      if ((window as any).timeSeriesStore) {
+        (window as any).timeSeriesStore.clear();
       }
       alert('Time series data cleared successfully!');
     }
@@ -66,8 +66,8 @@ export default function ControlPanel({
       });
       
       // Clear the in-memory store
-      if (window.timeSeriesStore) {
-        window.timeSeriesStore.clear();
+      if ((window as any).timeSeriesStore) {
+        (window as any).timeSeriesStore.clear();
       }
       
       alert('All local data cleared successfully! The page will refresh to apply changes.');

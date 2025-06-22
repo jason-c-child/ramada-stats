@@ -12,6 +12,7 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js';
+import 'chartjs-adapter-date-fns';
 
 ChartJS.register(
   CategoryScale,
@@ -52,14 +53,12 @@ interface GovernanceDashboardProps {
   isMinimized?: boolean;
   isMaximized?: boolean;
   onMinimize?: () => void;
-  onMaximize?: () => void;
 }
 
 export default function GovernanceDashboard({
   isMinimized = false,
   isMaximized = false,
-  onMinimize,
-  onMaximize
+  onMinimize
 }: GovernanceDashboardProps) {
   const [proposals, setProposals] = useState<Proposal[]>([]);
   const [governanceStats, setGovernanceStats] = useState<GovernanceStats>({
@@ -71,8 +70,6 @@ export default function GovernanceDashboard({
     participationRate: 0
   });
   const [participationHistory, setParticipationHistory] = useState<{ timestamp: number; value: number }[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [selectedProposal, setSelectedProposal] = useState<Proposal | null>(null);
   const [filterStatus, setFilterStatus] = useState<'all' | 'active' | 'passed' | 'rejected'>('all');
 
@@ -142,7 +139,6 @@ export default function GovernanceDashboard({
         participationRate
       });
       setParticipationHistory(mockParticipationHistory);
-      setLoading(false);
     };
 
     generateMockData();
@@ -189,7 +185,7 @@ export default function GovernanceDashboard({
         color: '#000',
         font: {
           size: 16,
-          weight: 'bold',
+          weight: 'bold' as const,
         },
       },
       tooltip: {
@@ -199,7 +195,7 @@ export default function GovernanceDashboard({
         borderColor: '#000',
         borderWidth: 1,
         callbacks: {
-          label: function(context: any) {
+          label: function(context: { parsed: { y: number } }) {
             return `Participation: ${formatPercentage(context.parsed.y)}`;
           },
         },
@@ -231,7 +227,7 @@ export default function GovernanceDashboard({
           font: {
             size: 10,
           },
-          callback: function(value: any) {
+          callback: function(value: string | number) {
             return `${value}%`;
           },
         },
@@ -241,7 +237,7 @@ export default function GovernanceDashboard({
           color: '#000',
           font: {
             size: 12,
-            weight: 'bold',
+            weight: 'bold' as const,
           },
         },
       },
@@ -314,7 +310,7 @@ export default function GovernanceDashboard({
             <label className="text-black text-sm font-bold">Filter by Status:</label>
             <select
               value={filterStatus}
-              onChange={(e) => setFilterStatus(e.target.value as any)}
+              onChange={(e) => setFilterStatus(e.target.value as 'all' | 'active' | 'passed' | 'rejected')}
               className="win95-select"
             >
               <option value="all">All Proposals</option>

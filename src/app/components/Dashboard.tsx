@@ -13,7 +13,6 @@ import CrossChainAnalytics from './CrossChainAnalytics';
 import PrivacyMetrics from './PrivacyMetrics';
 import GovernanceDashboard from './GovernanceDashboard';
 import AlertSystem from './AlertSystem';
-import TransferFlowNetwork from './TransferFlowNetwork';
 
 interface NetworkStats {
   latestBlock: string;
@@ -30,7 +29,6 @@ export default function Dashboard() {
   const [error, setError] = useState<string | null>(null);
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
   const [isMinimized, setIsMinimized] = useState(false);
-  const [isMaximized, setIsMaximized] = useState(false);
   const [pollingInterval, setPollingInterval] = useState(10000); // Default 10 seconds
   const [localStorageEnabled, setLocalStorageEnabled] = useState(false);
   const [isClient, setIsClient] = useState(false);
@@ -38,17 +36,10 @@ export default function Dashboard() {
   
   // Component minimize/maximize states
   const [validatorExplorerMinimized, setValidatorExplorerMinimized] = useState(false);
-  const [validatorExplorerMaximized, setValidatorExplorerMaximized] = useState(false);
   const [crossChainAnalyticsMinimized, setCrossChainAnalyticsMinimized] = useState(false);
-  const [crossChainAnalyticsMaximized, setCrossChainAnalyticsMaximized] = useState(false);
   const [privacyMetricsMinimized, setPrivacyMetricsMinimized] = useState(false);
-  const [privacyMetricsMaximized, setPrivacyMetricsMaximized] = useState(false);
   const [governanceDashboardMinimized, setGovernanceDashboardMinimized] = useState(false);
-  const [governanceDashboardMaximized, setGovernanceDashboardMaximized] = useState(false);
   const [alertSystemMinimized, setAlertSystemMinimized] = useState(false);
-  const [alertSystemMaximized, setAlertSystemMaximized] = useState(false);
-  const [transferFlowNetworkMinimized, setTransferFlowNetworkMinimized] = useState(false);
-  const [transferFlowNetworkMaximized, setTransferFlowNetworkMaximized] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
@@ -143,10 +134,6 @@ export default function Dashboard() {
     setIsMinimized(!isMinimized);
   };
 
-  const handleMaximize = () => {
-    setIsMaximized(!isMaximized);
-  };
-
   const handlePollingIntervalChange = (newInterval: number) => {
     setPollingInterval(newInterval);
     localStorage.setItem('namada-polling-interval', newInterval.toString());
@@ -179,7 +166,7 @@ export default function Dashboard() {
               <p className="text-black mb-4">{error}</p>
             </div>
             <div className="text-sm text-black mb-6 text-left">
-              <p className="mb-2">We're unable to connect to any Namada RPC endpoints.</p>
+              <p className="mb-2">We&apos;re unable to connect to any Namada RPC endpoints.</p>
               <p className="mb-2">This could be due to:</p>
               <ul className="list-disc list-inside space-y-1 ml-4">
                 <li>Network connectivity issues</li>
@@ -222,8 +209,8 @@ export default function Dashboard() {
   }
 
   return (
-    <div className={`${isMaximized ? 'fixed inset-0' : 'min-h-screen'} p-4 ${theme === 'win95' ? 'bg-[#008080]' : theme === 'winxp' ? 'bg-gradient-to-br from-[#245edc] to-[#1e3a8a]' : 'bg-gradient-to-br from-[#007AFF] to-[#5856D6]'}`}>
-      <div className={`${isMaximized ? 'h-full' : 'max-w-7xl'} mx-auto`}>
+    <div className={`min-h-screen p-4 ${theme === 'win95' ? 'bg-[#008080]' : theme === 'winxp' ? 'bg-gradient-to-br from-[#245edc] to-[#1e3a8a]' : 'bg-gradient-to-br from-[#007AFF] to-[#5856D6]'}`}>
+      <div className={`max-w-7xl mx-auto`}>
         {/* Main Window */}
         <div className="win95-window mb-4">
           <div className="win95-title-bar flex items-center justify-between">
@@ -268,45 +255,29 @@ export default function Dashboard() {
                 {/* Phase 3 Advanced Analytics */}
                 <PrivacyMetrics
                   isMinimized={privacyMetricsMinimized}
-                  isMaximized={privacyMetricsMaximized}
                   onMinimize={() => setPrivacyMetricsMinimized(!privacyMetricsMinimized)}
-                  onMaximize={() => setPrivacyMetricsMaximized(!privacyMetricsMaximized)}
                 />
                 
                 <GovernanceDashboard
                   isMinimized={governanceDashboardMinimized}
-                  isMaximized={governanceDashboardMaximized}
                   onMinimize={() => setGovernanceDashboardMinimized(!governanceDashboardMinimized)}
-                  onMaximize={() => setGovernanceDashboardMaximized(!governanceDashboardMaximized)}
                 />
                 
                 <AlertSystem
                   isMinimized={alertSystemMinimized}
-                  isMaximized={alertSystemMaximized}
                   onMinimize={() => setAlertSystemMinimized(!alertSystemMinimized)}
-                  onMaximize={() => setAlertSystemMaximized(!alertSystemMaximized)}
                 />
                 
-                <TransferFlowNetwork
-                  isMinimized={transferFlowNetworkMinimized}
-                  isMaximized={transferFlowNetworkMaximized}
-                  onMinimize={() => setTransferFlowNetworkMinimized(!transferFlowNetworkMinimized)}
-                  onMaximize={() => setTransferFlowNetworkMaximized(!transferFlowNetworkMaximized)}
-                />
                 
                 {/* Phase 2 Components */}
                 <ValidatorExplorer
                   isMinimized={validatorExplorerMinimized}
-                  isMaximized={validatorExplorerMaximized}
                   onMinimize={() => setValidatorExplorerMinimized(!validatorExplorerMinimized)}
-                  onMaximize={() => setValidatorExplorerMaximized(!validatorExplorerMaximized)}
                 />
                 
                 <CrossChainAnalytics
                   isMinimized={crossChainAnalyticsMinimized}
-                  isMaximized={crossChainAnalyticsMaximized}
                   onMinimize={() => setCrossChainAnalyticsMinimized(!crossChainAnalyticsMinimized)}
-                  onMaximize={() => setCrossChainAnalyticsMaximized(!crossChainAnalyticsMaximized)}
                 />
                 
                 {/* Control Panel */}

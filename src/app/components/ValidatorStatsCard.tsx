@@ -5,7 +5,6 @@ import { ValidatorStats } from '../lib/indexer-client';
 
 export default function ValidatorStatsCard({ stats }: { stats: ValidatorStats }) {
   const [isMinimized, setIsMinimized] = useState(false);
-  const [isMaximized, setIsMaximized] = useState(false);
 
   const formatNumber = (num: number | string) => new Intl.NumberFormat().format(Number(num));
   const formatVotingPower = (power: string) => {
@@ -20,10 +19,6 @@ export default function ValidatorStatsCard({ stats }: { stats: ValidatorStats })
 
   const handleMinimize = () => {
     setIsMinimized(!isMinimized);
-  };
-
-  const handleMaximize = () => {
-    setIsMaximized(!isMaximized);
   };
 
   if (isMinimized) {
@@ -44,7 +39,7 @@ export default function ValidatorStatsCard({ stats }: { stats: ValidatorStats })
   }
 
   return (
-    <div className={`win95-window ${isMaximized ? 'fixed inset-4 z-50' : ''}`}>
+    <div className={`win95-window`}>
       <div className="win95-title-bar flex items-center justify-between">
         <div className="flex items-center space-x-2">
           <div className="win95-icon bg-[#800080] border border-black"></div>

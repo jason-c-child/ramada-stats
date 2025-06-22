@@ -7,7 +7,6 @@ import ChartControls from './ChartControls';
 
 export default function ChartsDashboard() {
   const [isMinimized, setIsMinimized] = useState(false);
-  const [isMaximized, setIsMaximized] = useState(false);
   const [chartData, setChartData] = useState<TimeSeriesData>({
     blockTime: [],
     activeValidators: [],
@@ -46,32 +45,8 @@ export default function ChartsDashboard() {
     setIsMinimized(!isMinimized);
   };
 
-  const handleMaximize = () => {
-    setIsMaximized(!isMaximized);
-  };
-
   const handleChartReady = (chartId: string, chart: unknown) => {
     chartRefs.current[chartId] = chart;
-  };
-
-  const resetAllCharts = () => {
-    Object.values(chartRefs.current).forEach(chart => {
-      const chartObj = chart as { resetZoom?: () => void; scales?: { x?: { min?: number | null; max?: number | null }; y?: { min?: number | null; max?: number | null } }; update?: (mode: string) => void };
-      if (chartObj && chartObj.resetZoom) {
-        chartObj.resetZoom();
-      } else if (chartObj && chartObj.scales) {
-        // Manual reset if resetZoom is not available
-        if (chartObj.scales.x && typeof chartObj.scales.x.min === 'number') {
-          chartObj.scales.x.min = null;
-          chartObj.scales.x.max = null;
-        }
-        if (chartObj.scales.y && typeof chartObj.scales.y.min === 'number') {
-          chartObj.scales.y.min = null;
-          chartObj.scales.y.max = null;
-        }
-        chartObj.update?.('none');
-      }
-    });
   };
 
   const exportChartData = () => {
@@ -118,7 +93,7 @@ export default function ChartsDashboard() {
   }
 
   return (
-    <div className={`win95-window ${isMaximized ? 'fixed inset-4 z-50' : ''}`}>
+    <div className={`win95-window`}>
       <div className="win95-title-bar flex items-center justify-between">
         <div className="flex items-center space-x-2">
           <div className="win95-icon bg-[#ff8000] border border-black"></div>
