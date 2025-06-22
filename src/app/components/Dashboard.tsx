@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { indexerClient, ValidatorStats } from '../lib/indexer-client';
+import { timeSeriesStore } from '../lib/time-series-store';
 import NetworkStatsCard from './NetworkStatsCard';
 import ValidatorStatsCard from './ValidatorStatsCard';
+import ChartsDashboard from './ChartsDashboard';
 
 interface NetworkStats {
   latestBlock: any;
@@ -37,6 +39,22 @@ export default function Dashboard() {
           setNetworkStats(network);
           setValidatorStats(validators);
           setLastUpdate(new Date());
+
+          // Add data to time series store
+          timeSeriesStore.addDataPoint(
+            parseInt(network.latestBlock),
+            network.blockTime,
+            validators.activeValidators,
+            parseInt(validators.totalVotingPower),
+            parseInt(validators.averageVotingPower)
+          );
+          console.log('Added data point to time series store:', {
+            blockHeight: parseInt(network.latestBlock),
+            blockTime: network.blockTime,
+            activeValidators: validators.activeValidators,
+            totalVotingPower: parseInt(validators.totalVotingPower),
+            averageVotingPower: parseInt(validators.averageVotingPower)
+          });
         }
       } catch (err) {
         console.error('Failed to fetch data:', err);
@@ -54,7 +72,7 @@ export default function Dashboard() {
     };
 
     fetchData();
-    const interval = setInterval(fetchData, 30000); // Refresh every 30s
+    const interval = setInterval(fetchData, 10000); // Refresh every 10s
     
     return () => {
       isMounted = false;
@@ -175,13 +193,14 @@ export default function Dashboard() {
               <div className="space-y-6">
                 <NetworkStatsCard stats={networkStats} />
                 <ValidatorStatsCard stats={validatorStats} />
+                <ChartsDashboard />
                 
                 {/* Status Bar */}
                 <div className="win95-status-bar flex items-center justify-between">
                   <span>Last updated: {lastUpdate ? lastUpdate.toLocaleTimeString() : 'Unknown'}</span>
                   <span className="flex items-center">
                     <div className="w-2 h-2 bg-[#008000] border border-black mr-2"></div>
-                    Live data
+                    Live data (updates every 10s)
                   </span>
                 </div>
               </div>
