@@ -3,27 +3,32 @@
 import { useMemo, useRef, useCallback, useState, useEffect } from 'react';
 import {
   Chart as ChartJS,
+  LineElement,
+  PointElement,
+  LineController,
   CategoryScale,
   LinearScale,
-  PointElement,
-  LineElement,
-  Title,
+  TimeScale,
   Tooltip,
   Legend,
   Filler,
+  Title,
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 import 'chartjs-adapter-date-fns';
 
+// Register all necessary Chart.js components
 ChartJS.register(
+  LineElement,
+  PointElement,
+  LineController,
   CategoryScale,
   LinearScale,
-  PointElement,
-  LineElement,
-  Title,
+  TimeScale,
   Tooltip,
   Legend,
-  Filler
+  Filler,
+  Title
 );
 
 interface TPSDataPoint {
