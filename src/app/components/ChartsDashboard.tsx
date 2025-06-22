@@ -81,10 +81,10 @@ export default function ChartsDashboard() {
         <div className="win95-title-bar flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <div className="win95-icon bg-[#ff8000] border border-black"></div>
-            <span>Network Charts</span>
+            <span className="text-sm sm:text-base">Network Charts</span>
           </div>
           <div className="flex space-x-1">
-            <button onClick={handleMinimize} className="win95-button text-xs px-2 py-1">□</button>
+            <button onClick={handleMinimize} className="win95-button text-xs px-1 sm:px-2 py-1">□</button>
             
           </div>
         </div>
@@ -97,15 +97,15 @@ export default function ChartsDashboard() {
       <div className="win95-title-bar flex items-center justify-between">
         <div className="flex items-center space-x-2">
           <div className="win95-icon bg-[#ff8000] border border-black"></div>
-          <span>Network Charts</span>
+          <span className="text-sm sm:text-base">Network Charts</span>
         </div>
         <div className="flex space-x-1">
-          <button onClick={handleMinimize} className="win95-button text-xs px-2 py-1">_</button>
+          <button onClick={handleMinimize} className="win95-button text-xs px-1 sm:px-2 py-1">_</button>
           
         </div>
       </div>
       
-      <div className="p-6">
+      <div className="p-3 sm:p-4 md:p-6">
         {/* Chart Controls */}
         <ChartControls
           timeframe={timeframe}
@@ -119,43 +119,45 @@ export default function ChartsDashboard() {
           onExportData={exportChartData}
         />
 
-        <div className="grid grid-cols-1 gap-6">
+        <div className="grid grid-cols-1 gap-4 sm:gap-6">
           {/* Block Time Chart */}
-          <div className="win95-window-inset p-4">
-            <h3 className="text-lg font-bold text-black mb-4">Block Time Over Time</h3>
-            <TimeSeriesChart
-              key={`block-time-${updateCounter}-${timeframe}-${showTrendLine}-${showMovingAverage}-${movingAveragePeriod}`}
-              title="Block Time"
-              data={chartData.blockTime}
-              color="#0000ff"
-              yAxisLabel="Seconds"
-              formatValue={(value) => `${value.toFixed(2)}s`}
-              autoScale={true}
-              timeframe={timeframe}
-              showTrendLine={showTrendLine}
-              showMovingAverage={showMovingAverage}
-              movingAveragePeriod={movingAveragePeriod}
-              onChartReady={(chart) => handleChartReady('block-time', chart)}
-            />
+          <div className="win95-window-inset p-3 sm:p-4">
+            <h3 className="text-base sm:text-lg font-bold text-black mb-3 sm:mb-4">Block Time Over Time</h3>
+            <div className="h-48 sm:h-64 md:h-80 lg:h-96">
+              <TimeSeriesChart
+                key={`block-time-${updateCounter}-${timeframe}-${showTrendLine}-${showMovingAverage}-${movingAveragePeriod}`}
+                title="Block Time"
+                data={chartData.blockTime}
+                color="#0000ff"
+                yAxisLabel="Seconds"
+                formatValue={(value) => `${value.toFixed(2)}s`}
+                autoScale={true}
+                timeframe={timeframe}
+                showTrendLine={showTrendLine}
+                showMovingAverage={showMovingAverage}
+                movingAveragePeriod={movingAveragePeriod}
+                onChartReady={(chart) => handleChartReady('block-time', chart)}
+              />
+            </div>
           </div>
         </div>
 
         {/* Chart Controls */}
-        <div className="mt-6 pt-4 border-t border-black">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
+        <div className="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-black">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center space-y-2 sm:space-y-0 sm:space-x-4">
               <button 
                 onClick={() => timeSeriesStore.clear()} 
-                className="win95-button text-sm px-3 py-1"
+                className="win95-button text-xs sm:text-sm px-2 sm:px-3 py-1"
               >
                 Clear Data
               </button>
 
-              <span className="text-black text-sm">
+              <span className="text-black text-xs sm:text-sm">
                 Data points: {chartData.blockTime.length}
               </span>
             </div>
-            <div className="text-black text-sm">
+            <div className="text-black text-xs sm:text-sm">
               Charts update every 10 seconds
             </div>
           </div>

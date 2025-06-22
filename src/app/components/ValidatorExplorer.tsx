@@ -122,10 +122,10 @@ export default function ValidatorExplorer({
         <div className="win95-title-bar flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <div className="win95-icon bg-[#800080] border border-black"></div>
-            <span>Validator Explorer</span>
+            <span className="text-sm sm:text-base">Validator Explorer</span>
           </div>
           <div className="flex space-x-1">
-            <button onClick={onMinimize} className="win95-button text-xs px-2 py-1">□</button>
+            <button onClick={onMinimize} className="win95-button text-xs px-1 sm:px-2 py-1">□</button>
           </div>
         </div>
       </div>
@@ -137,49 +137,49 @@ export default function ValidatorExplorer({
       <div className="win95-title-bar flex items-center justify-between">
         <div className="flex items-center space-x-2">
           <div className="win95-icon bg-[#800080] border border-black"></div>
-          <span>Validator Explorer</span>
+          <span className="text-sm sm:text-base">Validator Explorer</span>
         </div>
         <div className="flex space-x-1">
-          <button onClick={onMinimize} className="win95-button text-xs px-2 py-1">_</button>
+          <button onClick={onMinimize} className="win95-button text-xs px-1 sm:px-2 py-1">_</button>
         </div>
       </div>
       
-      <div className="p-6">
+      <div className="p-3 sm:p-4 md:p-6">
         {/* Summary Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <div className="win95-window-inset p-4">
-            <div className="text-black text-sm font-bold mb-1">Total Validators</div>
-            <div className="text-2xl font-bold text-black">{formatNumber(validators.length)}</div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mb-4 sm:mb-6">
+          <div className="win95-window-inset p-3 sm:p-4">
+            <div className="text-black text-xs sm:text-sm font-bold mb-1">Total Validators</div>
+            <div className="text-lg sm:text-xl md:text-2xl font-bold text-black">{formatNumber(validators.length)}</div>
           </div>
-          <div className="win95-window-inset p-4">
-            <div className="text-black text-sm font-bold mb-1">Active Validators</div>
-            <div className="text-2xl font-bold text-black">{formatNumber(activeValidators)}</div>
+          <div className="win95-window-inset p-3 sm:p-4">
+            <div className="text-black text-xs sm:text-sm font-bold mb-1">Active Validators</div>
+            <div className="text-lg sm:text-xl md:text-2xl font-bold text-black">{formatNumber(activeValidators)}</div>
           </div>
-          <div className="win95-window-inset p-4">
-            <div className="text-black text-sm font-bold mb-1">Total Voting Power</div>
-            <div className="text-2xl font-bold text-black">{formatNumber(totalVotingPower)}</div>
+          <div className="win95-window-inset p-3 sm:p-4 sm:col-span-2 lg:col-span-1">
+            <div className="text-black text-xs sm:text-sm font-bold mb-1">Total Voting Power</div>
+            <div className="text-lg sm:text-xl md:text-2xl font-bold text-black">{formatNumber(totalVotingPower)}</div>
           </div>
         </div>
 
         {/* Search and Controls */}
-        <div className="win95-window-inset p-4 mb-4">
-          <div className="flex flex-col md:flex-row gap-4">
+        <div className="win95-window-inset p-3 sm:p-4 mb-3 sm:mb-4">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
             <div className="flex-1">
-              <label className="block text-black text-sm font-bold mb-2">Search Validators</label>
+              <label className="block text-black text-xs sm:text-sm font-bold mb-1 sm:mb-2">Search Validators</label>
               <input
                 type="text"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 placeholder="Search by name or address..."
-                className="win95-input w-full"
+                className="win95-input w-full text-xs sm:text-sm"
               />
             </div>
             <div>
-              <label className="block text-black text-sm font-bold mb-2">Sort By</label>
+              <label className="block text-black text-xs sm:text-sm font-bold mb-1 sm:mb-2">Sort By</label>
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as 'voting_power' | 'name' | 'commission')}
-                className="win95-select"
+                className="win95-select text-xs sm:text-sm"
               >
                 <option value="voting_power">Voting Power</option>
                 <option value="name">Name</option>
@@ -187,11 +187,11 @@ export default function ValidatorExplorer({
               </select>
             </div>
             <div>
-              <label className="block text-black text-sm font-bold mb-2">Order</label>
+              <label className="block text-black text-xs sm:text-sm font-bold mb-1 sm:mb-2">Order</label>
               <select
                 value={sortOrder}
                 onChange={(e) => setSortOrder(e.target.value as 'asc' | 'desc')}
-                className="win95-select"
+                className="win95-select text-xs sm:text-sm"
               >
                 <option value="desc">Descending</option>
                 <option value="asc">Ascending</option>

@@ -721,10 +721,10 @@ export default function AlertSystem({
         <div className="win95-title-bar flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <div className="win95-icon bg-[#FF6B35] border border-black"></div>
-            <span>Alert System</span>
+            <span className="text-sm sm:text-base">Alert System</span>
           </div>
           <div className="flex space-x-1">
-            <button onClick={onMinimize} className="win95-button text-xs px-2 py-1">□</button>
+            <button onClick={onMinimize} className="win95-button text-xs px-1 sm:px-2 py-1">□</button>
           </div>
         </div>
       </div>
@@ -736,20 +736,20 @@ export default function AlertSystem({
       <div className="win95-title-bar flex items-center justify-between">
         <div className="flex items-center space-x-2">
           <div className="win95-icon bg-[#FF6B35] border border-black"></div>
-          <span>Alert System</span>
+          <span className="text-sm sm:text-base">Alert System</span>
         </div>
         <div className="flex space-x-1">
-          <button onClick={onMinimize} className="win95-button text-xs px-2 py-1">_</button>
+          <button onClick={onMinimize} className="win95-button text-xs px-1 sm:px-2 py-1">_</button>
         </div>
       </div>
       
-      <div className="p-6">
+      <div className="p-3 sm:p-4 md:p-6">
         {/* Header with Create Button */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6 space-y-3 sm:space-y-0">
           <div>
-            <h2 className="text-xl font-bold text-black">Custom Alerts</h2>
-            <p className="text-sm text-gray-600">Monitor network metrics and get notified</p>
-            <div className="flex items-center space-x-4 mt-2 text-xs">
+            <h2 className="text-lg sm:text-xl font-bold text-black">Custom Alerts</h2>
+            <p className="text-xs sm:text-sm text-gray-600">Monitor network metrics and get notified</p>
+            <div className="flex flex-col sm:flex-row sm:items-center space-y-1 sm:space-y-0 sm:space-x-4 mt-2 text-xs">
               <span className="text-black">
                 Status: {isChecking ? 'Checking...' : 'Idle'}
               </span>
@@ -764,10 +764,10 @@ export default function AlertSystem({
               </span>
             </div>
           </div>
-          <div className="flex space-x-2">
+          <div className="flex flex-wrap gap-2">
             <button
               onClick={requestNotificationPermission}
-              className="win95-button text-sm px-3 py-1"
+              className="win95-button text-xs sm:text-sm px-2 sm:px-3 py-1"
             >
               {getNotificationStatus().status === 'granted' ? 'Notifications Enabled' : 
                getNotificationStatus().status === 'denied' ? 'Enable in Settings' : 
@@ -776,21 +776,21 @@ export default function AlertSystem({
             {getNotificationStatus().status === 'granted' && (
               <button
                 onClick={testBrowserNotification}
-                className="win95-button text-sm px-3 py-1 bg-blue-600 text-white"
+                className="win95-button text-xs sm:text-sm px-2 sm:px-3 py-1 bg-blue-600 text-white"
               >
                 Test Notification
               </button>
             )}
             <button
               onClick={() => setShowCreateForm(true)}
-              className="win95-button text-sm px-3 py-1"
+              className="win95-button text-xs sm:text-sm px-2 sm:px-3 py-1"
             >
               Create Alert
             </button>
             <button
               onClick={checkAlerts}
               disabled={isChecking}
-              className="win95-button text-sm px-3 py-1"
+              className="win95-button text-xs sm:text-sm px-2 sm:px-3 py-1"
             >
               {isChecking ? 'Checking...' : 'Check Now'}
             </button>
@@ -798,7 +798,7 @@ export default function AlertSystem({
               href="/webhook-receiver.html"
               target="_blank"
               rel="noopener noreferrer"
-              className="win95-button text-sm px-3 py-1"
+              className="win95-button text-xs sm:text-sm px-2 sm:px-3 py-1"
             >
               Test Webhook
             </a>
@@ -807,25 +807,25 @@ export default function AlertSystem({
 
         {/* Create Alert Form */}
         {showCreateForm && (
-          <div className="win95-window-inset p-4 mb-6">
-            <h3 className="text-lg font-bold text-black mb-4">Create New Alert</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="win95-window-inset p-3 sm:p-4 mb-4 sm:mb-6">
+            <h3 className="text-base sm:text-lg font-bold text-black mb-3 sm:mb-4">Create New Alert</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
               <div>
-                <label className="block text-black text-sm font-bold mb-1">Alert Name</label>
+                <label className="block text-black text-xs sm:text-sm font-bold mb-1">Alert Name</label>
                 <input
                   type="text"
                   value={newAlert.name}
                   onChange={(e) => setNewAlert({ ...newAlert, name: e.target.value })}
-                  className="win95-input w-full"
+                  className="win95-input w-full text-xs sm:text-sm"
                   placeholder="e.g., High Block Time Alert"
                 />
               </div>
               <div>
-                <label className="block text-black text-sm font-bold mb-1">Alert Type</label>
+                <label className="block text-black text-xs sm:text-sm font-bold mb-1">Alert Type</label>
                 <select
                   value={newAlert.type}
                   onChange={(e) => setNewAlert({ ...newAlert, type: e.target.value as Alert['type'] })}
-                  className="win95-select w-full"
+                  className="win95-select w-full text-xs sm:text-sm"
                 >
                   <option value="block-height">Block Height</option>
                   <option value="voting-power">Voting Power</option>
@@ -836,11 +836,11 @@ export default function AlertSystem({
                 </select>
               </div>
               <div>
-                <label className="block text-black text-sm font-bold mb-1">Condition</label>
+                <label className="block text-black text-xs sm:text-sm font-bold mb-1">Condition</label>
                 <select
                   value={newAlert.condition}
                   onChange={(e) => setNewAlert({ ...newAlert, condition: e.target.value as Alert['condition'] })}
-                  className="win95-select w-full"
+                  className="win95-select w-full text-xs sm:text-sm"
                 >
                   <option value="above">Above</option>
                   <option value="below">Below</option>
@@ -849,57 +849,57 @@ export default function AlertSystem({
                 </select>
               </div>
               <div>
-                <label className="block text-black text-sm font-bold mb-1">Threshold</label>
+                <label className="block text-black text-xs sm:text-sm font-bold mb-1">Threshold</label>
                 <input
                   type="number"
                   value={newAlert.threshold}
                   onChange={(e) => setNewAlert({ ...newAlert, threshold: parseFloat(e.target.value) })}
-                  className="win95-input w-full"
+                  className="win95-input w-full text-xs sm:text-sm"
                   placeholder="0"
                 />
               </div>
               <div>
-                <label className="block text-black text-sm font-bold mb-1">Notification Method</label>
+                <label className="block text-black text-xs sm:text-sm font-bold mb-1">Notification Method</label>
                 <select
                   value={newAlert.notificationMethod}
                   onChange={(e) => setNewAlert({ ...newAlert, notificationMethod: e.target.value as Alert['notificationMethod'] })}
-                  className="win95-select w-full"
+                  className="win95-select w-full text-xs sm:text-sm"
                 >
                   <option value="browser">Browser Notification</option>
                   <option value="webhook">Webhook</option>
                 </select>
               </div>
               <div>
-                <label className="block text-black text-sm font-bold mb-1">Cooldown (minutes)</label>
+                <label className="block text-black text-xs sm:text-sm font-bold mb-1">Cooldown (minutes)</label>
                 <input
                   type="number"
                   value={newAlert.cooldown}
                   onChange={(e) => setNewAlert({ ...newAlert, cooldown: parseInt(e.target.value) })}
-                  className="win95-input w-full"
+                  className="win95-input w-full text-xs sm:text-sm"
                   placeholder="5"
                   min="1"
                   max="1440"
                 />
               </div>
               {newAlert.notificationMethod === 'webhook' && (
-                <div>
-                  <label className="block text-black text-sm font-bold mb-1">Webhook URL</label>
+                <div className="sm:col-span-2">
+                  <label className="block text-black text-xs sm:text-sm font-bold mb-1">Webhook URL</label>
                   <input
                     type="url"
                     value={newAlert.webhookUrl}
                     onChange={(e) => setNewAlert({ ...newAlert, webhookUrl: e.target.value })}
-                    className="win95-input w-full"
+                    className="win95-input w-full text-xs sm:text-sm"
                     placeholder="https://api.example.com/webhook"
                   />
                 </div>
               )}
             </div>
-            <div className="mt-4">
-              <label className="block text-black text-sm font-bold mb-1">Description</label>
+            <div className="mt-3 sm:mt-4">
+              <label className="block text-black text-xs sm:text-sm font-bold mb-1">Description</label>
               <textarea
                 value={newAlert.description}
                 onChange={(e) => setNewAlert({ ...newAlert, description: e.target.value })}
-                className="win95-input w-full"
+                className="win95-input w-full text-xs sm:text-sm"
                 rows={3}
                 placeholder="Describe what this alert monitors..."
               />

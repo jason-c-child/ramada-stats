@@ -183,8 +183,8 @@ export default function TimeSeriesChart({
         borderWidth: 2,
         fill: true,
         tension: 0.4,
-        pointRadius: 3,
-        pointHoverRadius: 6,
+        pointRadius: 2,
+        pointHoverRadius: 4,
         pointBackgroundColor: color,
         pointBorderColor: '#000',
         pointBorderWidth: 1,
@@ -202,7 +202,7 @@ export default function TimeSeriesChart({
         fill: false,
         tension: 0.1,
         pointRadius: 0,
-        pointHoverRadius: 4,
+        pointHoverRadius: 3,
         pointBackgroundColor: '#ff6b6b',
         pointBorderColor: '#000',
         pointBorderWidth: 1,
@@ -220,7 +220,7 @@ export default function TimeSeriesChart({
         fill: false,
         tension: 0,
         pointRadius: 0,
-        pointHoverRadius: 4,
+        pointHoverRadius: 3,
         pointBackgroundColor: '#4ecdc4',
         pointBorderColor: '#000',
         pointBorderWidth: 1,
@@ -254,9 +254,13 @@ export default function TimeSeriesChart({
         text: title,
         color: '#000',
         font: {
-          size: 16,
+          size: 14,
           weight: 'bold' as const,
         },
+        padding: {
+          top: 10,
+          bottom: 10
+        }
       },
       tooltip: {
         backgroundColor: '#fff',
@@ -264,6 +268,12 @@ export default function TimeSeriesChart({
         bodyColor: '#000',
         borderColor: '#000',
         borderWidth: 1,
+        titleFont: {
+          size: 12
+        },
+        bodyFont: {
+          size: 11
+        },
         callbacks: {
           label: function(tooltipItem: any) {
             return `${tooltipItem.dataset.label}: ${formatValue(tooltipItem.parsed.y)}`;
@@ -281,10 +291,14 @@ export default function TimeSeriesChart({
         ticks: {
           color: '#000',
           font: {
-            size: 10,
+            size: 9,
           },
-          maxTicksLimit: 8,
+          maxTicksLimit: 6,
+          maxRotation: 0,
         },
+        title: {
+          display: false,
+        }
       },
       y: {
         beginAtZero: !autoScale,
@@ -297,8 +311,9 @@ export default function TimeSeriesChart({
         ticks: {
           color: '#000',
           font: {
-            size: 10,
+            size: 9,
           },
+          maxTicksLimit: 5,
           callback: function(value: string | number) {
             return formatValue(Number(value));
           },
@@ -308,9 +323,13 @@ export default function TimeSeriesChart({
           text: yAxisLabel,
           color: '#000',
           font: {
-            size: 12,
+            size: 10,
             weight: 'bold' as const,
           },
+          padding: {
+            top: 5,
+            bottom: 5
+          }
         },
       },
     },
@@ -318,6 +337,23 @@ export default function TimeSeriesChart({
       intersect: false,
       mode: 'index' as const,
     },
+    elements: {
+      point: {
+        radius: 2,
+        hoverRadius: 4,
+      },
+      line: {
+        tension: 0.4,
+      }
+    },
+    layout: {
+      padding: {
+        top: 10,
+        right: 10,
+        bottom: 10,
+        left: 10
+      }
+    }
   };
 
   const handleChartRef = useCallback((chart: any) => {
@@ -333,7 +369,7 @@ export default function TimeSeriesChart({
   console.log('TimeSeriesChart: Rendering chart for', title, 'with', data.length, 'data points');
 
   return (
-    <div className="win95-window-inset p-4" style={{ height: '300px' }}>
+    <div className="win95-window-inset p-2 sm:p-3 md:p-4 h-full min-h-[200px] sm:min-h-[250px] md:min-h-[300px]">
       {(() => {
         try {
           return (
@@ -346,7 +382,7 @@ export default function TimeSeriesChart({
         } catch (error) {
           console.error('TimeSeriesChart: Error rendering chart for', title, error);
           return (
-            <div className="text-red-600 text-center">
+            <div className="text-red-600 text-center text-xs sm:text-sm p-4">
               Error rendering chart: {error instanceof Error ? error.message : 'Unknown error'}
             </div>
           );

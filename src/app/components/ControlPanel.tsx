@@ -198,12 +198,12 @@ export default function ControlPanel({
       <div className="win95-title-bar flex items-center justify-between">
         <div className="flex items-center space-x-2">
           <div className="win95-icon bg-[#0000ff] border border-black"></div>
-          <span>Control Panel</span>
+          <span className="text-sm sm:text-base">Control Panel</span>
         </div>
         <div className="flex space-x-1">
           <button 
             onClick={() => setIsExpanded(!isExpanded)} 
-            className="win95-button text-xs px-2 py-1"
+            className="win95-button text-xs px-1 sm:px-2 py-1"
           >
             {isExpanded ? '_' : '□'}
           </button>
@@ -211,11 +211,11 @@ export default function ControlPanel({
       </div>
       
       {isExpanded && (
-        <div className="p-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="p-3 sm:p-4 md:p-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
             {/* Polling Interval Control */}
-            <div className="win95-window-inset p-4">
-              <h3 className="text-black font-bold mb-4">Data Refresh Rate</h3>
+            <div className="win95-window-inset p-3 sm:p-4">
+              <h3 className="text-black font-bold mb-3 sm:mb-4 text-sm sm:text-base">Data Refresh Rate</h3>
               <div className="space-y-2">
                 {pollingOptions.map((option) => (
                   <label key={option.value} className="flex items-center space-x-2">
@@ -227,15 +227,15 @@ export default function ControlPanel({
                       onChange={(e) => onPollingIntervalChange(parseInt(e.target.value))}
                       className="win95-radio"
                     />
-                    <span className="text-black text-sm">{option.label}</span>
+                    <span className="text-black text-xs sm:text-sm">{option.label}</span>
                   </label>
                 ))}
               </div>
             </div>
 
             {/* Local Storage Control */}
-            <div className="win95-window-inset p-4">
-              <h3 className="text-black font-bold mb-4">Data Persistence</h3>
+            <div className="win95-window-inset p-3 sm:p-4">
+              <h3 className="text-black font-bold mb-3 sm:mb-4 text-sm sm:text-base">Data Persistence</h3>
               <div className="space-y-2">
                 <label className="flex items-center space-x-2">
                   <input
@@ -244,7 +244,7 @@ export default function ControlPanel({
                     onChange={(e) => onLocalStorageToggle(e.target.checked)}
                     className="win95-checkbox"
                   />
-                  <span className="text-black text-sm">Enable Local Storage</span>
+                  <span className="text-black text-xs sm:text-sm">Enable Local Storage</span>
                 </label>
                 <p className="text-black text-xs">
                   Store time series data locally for offline viewing
@@ -267,43 +267,43 @@ export default function ControlPanel({
             </div>
 
             {/* Data Management */}
-            <div className="win95-window-inset p-4 md:col-span-2">
-              <h3 className="text-black font-bold mb-4">Data Management</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="win95-window-inset p-3 sm:p-4 lg:col-span-2">
+              <h3 className="text-black font-bold mb-3 sm:mb-4 text-sm sm:text-base">Data Management</h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                 <div>
-                  <h4 className="text-black font-semibold text-sm mb-2">Time Series Data</h4>
+                  <h4 className="text-black font-semibold text-xs sm:text-sm mb-2">Time Series Data</h4>
                   <p className="text-black text-xs mb-2">
                     Historical network metrics and charts data
                   </p>
                   <button
                     onClick={() => setShowClearConfirm('timeSeries')}
-                    className="win95-button text-xs px-3 py-1 bg-yellow-600 text-white"
+                    className="win95-button text-xs px-2 sm:px-3 py-1 bg-yellow-600 text-white"
                   >
                     Clear Time Series
                   </button>
                 </div>
                 
                 <div>
-                  <h4 className="text-black font-semibold text-sm mb-2">Alert Data</h4>
+                  <h4 className="text-black font-semibold text-xs sm:text-sm mb-2">Alert Data</h4>
                   <p className="text-black text-xs mb-2">
                     Custom alerts, notifications, and trigger history
                   </p>
                   <button
                     onClick={() => setShowClearConfirm('alerts')}
-                    className="win95-button text-xs px-3 py-1 bg-orange-600 text-white"
+                    className="win95-button text-xs px-2 sm:px-3 py-1 bg-orange-600 text-white"
                   >
                     Clear Alerts
                   </button>
                 </div>
                 
-                <div>
-                  <h4 className="text-black font-semibold text-sm mb-2">All Data</h4>
+                <div className="sm:col-span-2 lg:col-span-1">
+                  <h4 className="text-black font-semibold text-xs sm:text-sm mb-2">All Data</h4>
                   <p className="text-black text-xs mb-2">
                     Clear all locally stored data and settings
                   </p>
                   <button
                     onClick={() => setShowClearConfirm('all')}
-                    className="win95-button text-xs px-3 py-1 bg-red-600 text-white"
+                    className="win95-button text-xs px-2 sm:px-3 py-1 bg-red-600 text-white"
                   >
                     Clear All Data
                   </button>
@@ -312,20 +312,20 @@ export default function ControlPanel({
               
               {/* Export/Import Section */}
               <div className="mt-4 pt-4 border-t border-gray-300">
-                <h4 className="text-black font-semibold text-sm mb-2">Configuration Backup</h4>
+                <h4 className="text-black font-semibold text-xs sm:text-sm mb-2">Configuration Backup</h4>
                 <p className="text-black text-xs mb-3">
                   Export your configuration and data for backup, or import from a previous backup
                 </p>
-                <div className="flex space-x-2">
+                <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
                   <button
                     onClick={exportConfiguration}
-                    className="win95-button text-xs px-3 py-1 bg-green-600 text-white"
+                    className="win95-button text-xs px-2 sm:px-3 py-1 bg-green-600 text-white"
                   >
                     Export Config
                   </button>
                   <button
                     onClick={importConfiguration}
-                    className="win95-button text-xs px-3 py-1 bg-blue-600 text-white"
+                    className="win95-button text-xs px-2 sm:px-3 py-1 bg-blue-600 text-white"
                   >
                     Import Config
                   </button>
@@ -334,36 +334,36 @@ export default function ControlPanel({
             </div>
 
             {/* Theme Switcher */}
-            <div className="win95-window-inset p-4 md:col-span-2">
+            <div className="win95-window-inset p-3 sm:p-4 lg:col-span-2">
               <ThemeSwitcher />
             </div>
           </div>
 
           {/* Confirmation Dialogs */}
           {showClearConfirm && (
-            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-              <div className="win95-window max-w-md">
+            <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+              <div className="win95-window w-full max-w-md">
                 <div className="win95-title-bar flex items-center justify-between">
                   <div className="flex items-center space-x-2">
                     <div className="win95-icon bg-[#ff0000] border border-black"></div>
-                    <span>Confirm Action</span>
+                    <span className="text-sm sm:text-base">Confirm Action</span>
                   </div>
                   <div className="flex space-x-1">
                     <button 
                       onClick={() => setShowClearConfirm(null)}
-                      className="win95-button text-xs px-2 py-1"
+                      className="win95-button text-xs px-1 sm:px-2 py-1"
                     >
                       ×
                     </button>
                   </div>
                 </div>
-                <div className="p-6">
-                  <h3 className="text-black font-bold mb-4">
+                <div className="p-4 sm:p-6">
+                  <h3 className="text-black font-bold mb-3 sm:mb-4 text-sm sm:text-base">
                     {showClearConfirm === 'timeSeries' && 'Clear Time Series Data'}
                     {showClearConfirm === 'alerts' && 'Clear Alert Data'}
                     {showClearConfirm === 'all' && 'Clear All Local Data'}
                   </h3>
-                  <p className="text-black text-sm mb-4">
+                  <p className="text-black text-xs sm:text-sm mb-4">
                     {showClearConfirm === 'timeSeries' && 
                       'This will permanently delete all stored time series data including historical charts and metrics. This action cannot be undone.'}
                     {showClearConfirm === 'alerts' && 
@@ -371,7 +371,7 @@ export default function ControlPanel({
                     {showClearConfirm === 'all' && 
                       'This will permanently delete ALL locally stored data including settings, alerts, time series data, and configurations. The page will refresh after clearing. This action cannot be undone.'}
                   </p>
-                  <div className="flex space-x-2">
+                  <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
                     <button
                       onClick={() => {
                         if (showClearConfirm === 'timeSeries') {
@@ -383,13 +383,13 @@ export default function ControlPanel({
                         }
                         setShowClearConfirm(null);
                       }}
-                      className="win95-button bg-red-600 text-white"
+                      className="win95-button bg-red-600 text-white text-xs sm:text-sm px-2 sm:px-3 py-1"
                     >
                       Confirm Clear
                     </button>
                     <button
                       onClick={() => setShowClearConfirm(null)}
-                      className="win95-button"
+                      className="win95-button text-xs sm:text-sm px-2 sm:px-3 py-1"
                     >
                       Cancel
                     </button>

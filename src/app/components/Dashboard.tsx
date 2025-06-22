@@ -141,25 +141,25 @@ export default function Dashboard() {
 
   if (error && !networkStats) {
     return (
-      <div className={`min-h-screen p-4 flex items-center justify-center ${theme === 'win95' ? 'bg-[#008080]' : theme === 'winxp' ? 'bg-gradient-to-br from-[#245edc] to-[#1e3a8a]' : 'bg-gradient-to-br from-[#007AFF] to-[#5856D6]'}`}>
-        <div className="win95-window max-w-md">
+      <div className={`min-h-screen p-2 sm:p-4 flex items-center justify-center ${theme === 'win95' ? 'bg-[#008080]' : theme === 'winxp' ? 'bg-gradient-to-br from-[#245edc] to-[#1e3a8a]' : 'bg-gradient-to-br from-[#007AFF] to-[#5856D6]'}`}>
+        <div className="win95-window w-full max-w-md mx-2">
           <div className="win95-title-bar flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <div className="win95-icon bg-[#ff0000] border border-black"></div>
-              <span>Error</span>
+              <span className="text-sm sm:text-base">Error</span>
             </div>
             <div className="flex space-x-1">
-              <button className="win95-button text-xs px-2 py-1">_</button>
-              <button className="win95-button text-xs px-2 py-1">□</button>
+              <button className="win95-button text-xs px-1 sm:px-2 py-1">_</button>
+              <button className="win95-button text-xs px-1 sm:px-2 py-1">□</button>
             </div>
           </div>
-          <div className="p-6 text-center">
+          <div className="p-3 sm:p-6 text-center">
             <div className="mb-4">
               <div className="win95-icon bg-[#ff0000] border border-black mx-auto mb-2"></div>
-              <h1 className="text-lg font-bold text-black mb-2">Network Unavailable</h1>
-              <p className="text-black mb-4">{error}</p>
+              <h1 className="text-base sm:text-lg font-bold text-black mb-2">Network Unavailable</h1>
+              <p className="text-black mb-4 text-sm sm:text-base">{error}</p>
             </div>
-            <div className="text-sm text-black mb-6 text-left">
+            <div className="text-xs sm:text-sm text-black mb-6 text-left">
               <p className="mb-2">We&apos;re unable to connect to any Namada RPC endpoints.</p>
               <p className="mb-2">This could be due to:</p>
               <ul className="list-disc list-inside space-y-1 ml-4">
@@ -170,7 +170,7 @@ export default function Dashboard() {
             </div>
             <button 
               onClick={() => window.location.reload()} 
-              className="win95-button"
+              className="win95-button text-sm sm:text-base px-3 sm:px-4 py-2"
             >
               Retry Connection
             </button>
@@ -182,17 +182,17 @@ export default function Dashboard() {
 
   if (isMinimized) {
     return (
-      <div className={`min-h-screen p-4 ${theme === 'win95' ? 'bg-[#008080]' : theme === 'winxp' ? 'bg-gradient-to-br from-[#245edc] to-[#1e3a8a]' : 'bg-gradient-to-br from-[#007AFF] to-[#5856D6]'}`}>
+      <div className={`min-h-screen p-2 sm:p-4 ${theme === 'win95' ? 'bg-[#008080]' : theme === 'winxp' ? 'bg-gradient-to-br from-[#245edc] to-[#1e3a8a]' : 'bg-gradient-to-br from-[#007AFF] to-[#5856D6]'}`}>
         <div className="max-w-7xl mx-auto">
           <div className="win95-window mb-4">
             <div className="win95-title-bar flex items-center justify-between">
               <div className="flex items-center space-x-2">
                 <div className="win95-icon bg-[#0000ff] border border-black"></div>
-                <span>Namada Analytics Dashboard</span>
+                <span className="text-sm sm:text-base">Namada Analytics Dashboard</span>
               </div>
               
               <div className="flex space-x-1">
-                <button onClick={handleMinimize} className="win95-button text-xs px-2 py-1">□</button>
+                <button onClick={handleMinimize} className="win95-button text-xs px-1 sm:px-2 py-1">□</button>
                 
               </div>
             </div>
@@ -203,42 +203,42 @@ export default function Dashboard() {
   }
 
   return (
-    <div className={`min-h-screen p-4 ${theme === 'win95' ? 'bg-[#008080]' : theme === 'winxp' ? 'bg-gradient-to-br from-[#245edc] to-[#1e3a8a]' : 'bg-gradient-to-br from-[#007AFF] to-[#5856D6]'}`}>
+    <div className={`min-h-screen p-1 sm:p-2 md:p-4 ${theme === 'win95' ? 'bg-[#008080]' : theme === 'winxp' ? 'bg-gradient-to-br from-[#245edc] to-[#1e3a8a]' : 'bg-gradient-to-br from-[#007AFF] to-[#5856D6]'}`}>
       <div className={`max-w-7xl mx-auto`}>
         {/* Main Window */}
-        <div className="win95-window mb-4">
+        <div className="win95-window mb-2 sm:mb-4">
           <div className="win95-title-bar flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <div className="win95-icon bg-[#0000ff] border border-black"></div>
-              <span>Namada Analytics Dashboard</span>
+              <span className="text-xs sm:text-sm md:text-base truncate">Namada Analytics Dashboard</span>
             </div>
           </div>
           
-          <div className="p-6">
+          <div className="p-2 sm:p-3 md:p-6">
             {/* Header */}
-            <div className="text-center mb-8">
-              <div className="win95-window-inset inline-block p-4 mb-4">
+            <div className="text-center mb-4 sm:mb-6 md:mb-8">
+              <div className="win95-window-inset inline-block p-2 sm:p-3 md:p-4 mb-2 sm:mb-3 md:mb-4">
                 <div className="win95-icon bg-[#0000ff] border border-black mx-auto mb-2"></div>
               </div>
-              <h1 className="text-3xl font-bold text-black mb-2">
+              <h1 className="text-lg sm:text-xl md:text-3xl font-bold text-black mb-1 sm:mb-2">
                 Namada Analytics
               </h1>
-              <p className="text-black text-lg">
+              <p className="text-black text-xs sm:text-sm md:text-lg px-2">
                 Real-time blockchain metrics and network insights
               </p>
             </div>
             
             {/* Content */}
             {loading ? (
-              <div className="text-center py-12">
-                <div className="win95-progress-bar mx-auto mb-4 w-64">
+              <div className="text-center py-6 sm:py-8 md:py-12">
+                <div className="win95-progress-bar mx-auto mb-4 w-32 sm:w-48 md:w-64">
                   <div className="win95-progress-fill" style={{ width: '60%' }}></div>
                 </div>
-                <div className="text-black text-lg mb-2">Loading network data...</div>
-                <div className="text-black text-sm">Connecting to Namada RPC endpoints</div>
+                <div className="text-black text-sm sm:text-base md:text-lg mb-2">Loading network data...</div>
+                <div className="text-black text-xs sm:text-sm">Connecting to Namada RPC endpoints</div>
               </div>
             ) : networkStats && validatorStats ? (
-              <div className="space-y-6">
+              <div className="space-y-3 sm:space-y-4 md:space-y-6">
                 {/* Core Network Stats */}
                 <NetworkStatsCard stats={networkStats} pollingInterval={pollingInterval} />
                 <ValidatorStatsCard stats={validatorStats} />
@@ -247,11 +247,11 @@ export default function Dashboard() {
                 <ChartsDashboard />
                 
                 {/* Available Data Note */}
-                <div className="win95-window-inset p-4 mb-6">
-                  <h3 className="text-lg font-bold text-black mb-2">Available Data</h3>
-                  <div className="text-black text-sm">
+                <div className="win95-window-inset p-2 sm:p-3 md:p-4 mb-3 sm:mb-4 md:mb-6">
+                  <h3 className="text-sm sm:text-base md:text-lg font-bold text-black mb-2">Available Data</h3>
+                  <div className="text-black text-xs sm:text-sm">
                     <p className="mb-2">This dashboard currently displays real-time data from Namada RPC endpoints:</p>
-                    <ul className="list-disc list-inside space-y-1 ml-4">
+                    <ul className="list-disc list-inside space-y-1 ml-2 sm:ml-4">
                       <li>Network statistics (block height, epoch, validator count)</li>
                       <li>Validator information and voting power</li>
                       <li>Time series charts of network metrics</li>
@@ -285,20 +285,20 @@ export default function Dashboard() {
                 )}
                 
                 {/* Status Bar */}
-                <div className="win95-status-bar flex items-center justify-between">
-                  <span>Last updated: {lastUpdate ? lastUpdate.toLocaleTimeString() : 'Unknown'}</span>
-                  <span className="flex items-center">
+                <div className="win95-status-bar flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-1 sm:space-y-0 p-2 sm:p-3">
+                  <span className="text-xs sm:text-sm">Last updated: {lastUpdate ? lastUpdate.toLocaleTimeString() : 'Unknown'}</span>
+                  <span className="flex items-center text-xs sm:text-sm">
                     <div className="w-2 h-2 bg-[#008000] border border-black mr-2"></div>
                     Live data (updates every {pollingInterval / 1000}s)
                   </span>
                 </div>
               </div>
             ) : (
-              <div className="text-center py-12">
-                <div className="win95-window-inset inline-block p-8">
+              <div className="text-center py-6 sm:py-8 md:py-12">
+                <div className="win95-window-inset inline-block p-4 sm:p-6 md:p-8">
                   <div className="win95-icon bg-[#ff0000] border border-black mx-auto mb-4"></div>
-                  <h2 className="text-xl font-bold text-black mb-2">No Data Available</h2>
-                  <p className="text-black">Unable to load network statistics</p>
+                  <h2 className="text-base sm:text-lg md:text-xl font-bold text-black mb-2">No Data Available</h2>
+                  <p className="text-black text-xs sm:text-sm md:text-base">Unable to load network statistics</p>
                 </div>
               </div>
             )}

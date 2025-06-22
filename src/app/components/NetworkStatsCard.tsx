@@ -45,84 +45,81 @@ export default function NetworkStatsCard({ stats, pollingInterval = 10000 }: Net
   const epochProgress = getEpochProgress(stats.currentEpoch);
 
   return (
-    <div className="card">
-      <div className="card-header">
-        <div className="flex items-center justify-between">
-          <div>
-            <h3 className="card-title">Network Statistics</h3>
-            <p className="card-subtitle">Real-time network metrics and performance</p>
-          </div>
-          <div className={`status status-${blockStatus.color}`}>
-            {blockStatus.text}
-          </div>
+    <div className="win95-window">
+      <div className="win95-title-bar flex items-center justify-between">
+        <div className="flex items-center space-x-2">
+          <div className="win95-icon bg-[#0000ff] border border-black"></div>
+          <span className="text-sm sm:text-base">Network Statistics</span>
+        </div>
+        <div className="flex space-x-1">
+          <div className={`w-2 h-2 border border-black ${blockStatus.color === 'success' ? 'bg-[#008000]' : blockStatus.color === 'warning' ? 'bg-[#ff8000]' : 'bg-[#ff0000]'}`}></div>
         </div>
       </div>
       
-      <div className="card-body">
-        <div className="stats-grid">
+      <div className="p-3 sm:p-4 md:p-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 mb-4 sm:mb-6">
           {/* Latest Block */}
-          <div className="stat-card">
-            <div className="stat-header">
-              <div className="stat-icon blue">📦</div>
+          <div className="win95-window-inset p-3 sm:p-4">
+            <div className="flex items-center justify-between mb-2 sm:mb-3">
+              <div className="win95-icon bg-[#0000ff] border border-black"></div>
+              <div className="w-2 h-2 bg-[#0000ff] border border-black"></div>
             </div>
-            <div className="stat-value">
+            <div className="text-black text-xs sm:text-sm font-bold mb-1">Latest Block</div>
+            <div className="text-lg sm:text-xl md:text-2xl font-bold text-black mb-1">
               {formatNumber(parseInt(stats.latestBlock))}
             </div>
-            <div className="stat-label">Latest Block</div>
-            <div className="stat-description">
-              Current block height with ~5 second block time
-            </div>
+            <div className="text-black text-xs">~5 second block time</div>
           </div>
           
           {/* Current Epoch */}
-          <div className="stat-card">
-            <div className="stat-header">
-              <div className="stat-icon green">⏱️</div>
+          <div className="win95-window-inset p-3 sm:p-4">
+            <div className="flex items-center justify-between mb-2 sm:mb-3">
+              <div className="win95-icon bg-[#008000] border border-black"></div>
+              <div className="w-2 h-2 bg-[#008000] border border-black"></div>
             </div>
-            <div className="stat-value">
+            <div className="text-black text-xs sm:text-sm font-bold mb-1">Current Epoch</div>
+            <div className="text-lg sm:text-xl md:text-2xl font-bold text-black mb-1">
               {formatNumber(stats.currentEpoch)}
             </div>
-            <div className="stat-label">Current Epoch</div>
-            <div className="progress">
+            <div className="win95-progress-bar mb-1">
               <div 
-                className="progress-bar"
+                className="win95-progress-fill"
                 style={{ width: `${epochProgress}%` }}
               ></div>
             </div>
-            <div className="stat-description">
-              {epochProgress.toFixed(1)}% complete • 1000 blocks per epoch
+            <div className="text-black text-xs">
+              {epochProgress.toFixed(1)}% complete • 1000 blocks
             </div>
           </div>
           
           {/* Total Validators */}
-          <div className="stat-card">
-            <div className="stat-header">
-              <div className="stat-icon orange">👥</div>
+          <div className="win95-window-inset p-3 sm:p-4 sm:col-span-2 lg:col-span-1">
+            <div className="flex items-center justify-between mb-2 sm:mb-3">
+              <div className="win95-icon bg-[#ff8000] border border-black"></div>
+              <div className="w-2 h-2 bg-[#ff8000] border border-black"></div>
             </div>
-            <div className="stat-value">
+            <div className="text-black text-xs sm:text-sm font-bold mb-1">Total Validators</div>
+            <div className="text-lg sm:text-xl md:text-2xl font-bold text-black mb-1">
               {formatNumber(stats.totalValidators)}
             </div>
-            <div className="stat-label">Total Validators</div>
-            <div className="stat-description">
-              Active network consensus participants
-            </div>
+            <div className="text-black text-xs">Active consensus participants</div>
           </div>
         </div>
         
         {/* Network Status */}
-        <div className="mt-8 pt-6 border-t border-border">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
+        <div className="mt-4 sm:mt-6 pt-3 sm:pt-4 border-t border-black">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-2 sm:space-y-0">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
               <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-success rounded-full"></div>
-                <span className="text-sm font-medium text-primary">Network Online</span>
+                <div className="w-2 h-2 bg-[#008000] border border-black"></div>
+                <span className="text-xs sm:text-sm font-medium text-black">Network Online</span>
               </div>
               <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-accent rounded-full"></div>
-                <span className="text-sm text-secondary">Block Production Active</span>
+                <div className="w-2 h-2 bg-[#0000ff] border border-black"></div>
+                <span className="text-xs sm:text-sm text-black">Block Production Active</span>
               </div>
             </div>
-            <div className="text-sm text-secondary">
+            <div className="text-xs sm:text-sm text-black">
               Auto-refresh every {formatPollingInterval(pollingInterval)}
             </div>
           </div>
