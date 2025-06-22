@@ -1,8 +1,16 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #008080;
+  --foreground: #000000;
+  --win95-gray: #c0c0c0;
+  --win95-dark-gray: #808080;
+  --win95-light-gray: #dfdfdf;
+  --win95-white: #ffffff;
+  --win95-black: #000000;
+  --win95-blue: #000080;
+  --win95-green: #008000;
+  --win95-red: #800000;
 }
 
 @theme inline {
@@ -14,15 +22,144 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #008080;
+    --foreground: #000000;
   }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'MS Sans Serif', 'Microsoft Sans Serif', Arial, sans-serif;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+}
+
+/* Windows 95 Retro Styles */
+.win95-window {
+  background: var(--win95-gray);
+  border: 2px outset var(--win95-gray);
+  box-shadow: 
+    inset 1px 1px 0px var(--win95-white),
+    inset -1px -1px 0px var(--win95-dark-gray),
+    1px 1px 0px var(--win95-white),
+    -1px -1px 0px var(--win95-dark-gray);
+}
+
+.win95-window-inset {
+  background: var(--win95-gray);
+  border: 2px inset var(--win95-gray);
+  box-shadow: 
+    inset 1px 1px 0px var(--win95-dark-gray),
+    inset -1px -1px 0px var(--win95-white);
+}
+
+.win95-button {
+  background: var(--win95-gray);
+  border: 2px outset var(--win95-gray);
+  color: var(--win95-black);
+  font-family: 'MS Sans Serif', 'Microsoft Sans Serif', Arial, sans-serif;
+  font-size: 11px;
+  font-weight: bold;
+  padding: 4px 8px;
+  cursor: pointer;
+  user-select: none;
+  box-shadow: 
+    inset 1px 1px 0px var(--win95-white),
+    inset -1px -1px 0px var(--win95-dark-gray);
+}
+
+.win95-button:hover {
+  background: var(--win95-light-gray);
+}
+
+.win95-button:active {
+  border: 2px inset var(--win95-gray);
+  box-shadow: 
+    inset 1px 1px 0px var(--win95-dark-gray),
+    inset -1px -1px 0px var(--win95-white);
+}
+
+.win95-title-bar {
+  background: linear-gradient(90deg, var(--win95-blue) 0%, #0000ff 100%);
+  color: var(--win95-white);
+  font-family: 'MS Sans Serif', 'Microsoft Sans Serif', Arial, sans-serif;
+  font-size: 11px;
+  font-weight: bold;
+  padding: 2px 4px;
+  border-bottom: 1px solid var(--win95-black);
+}
+
+.win95-icon {
+  width: 16px;
+  height: 16px;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+}
+
+.win95-status-bar {
+  background: var(--win95-gray);
+  border-top: 1px solid var(--win95-white);
+  border-left: 1px solid var(--win95-white);
+  border-right: 1px solid var(--win95-dark-gray);
+  border-bottom: 1px solid var(--win95-dark-gray);
+  padding: 2px 4px;
+  font-size: 10px;
+  color: var(--win95-black);
+}
+
+.win95-table {
+  background: var(--win95-white);
+  border: 1px solid var(--win95-black);
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.win95-table th {
+  background: var(--win95-gray);
+  border: 1px solid var(--win95-black);
+  padding: 4px 8px;
+  font-size: 11px;
+  font-weight: bold;
+  text-align: left;
+}
+
+.win95-table td {
+  border: 1px solid var(--win95-black);
+  padding: 4px 8px;
+  font-size: 11px;
+}
+
+.win95-table tr:nth-child(even) {
+  background: var(--win95-light-gray);
+}
+
+.win95-progress-bar {
+  background: var(--win95-white);
+  border: 1px inset var(--win95-gray);
+  height: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.win95-progress-fill {
+  background: var(--win95-blue);
+  height: 100%;
+  transition: width 0.3s ease;
+}
+
+.win95-scrollbar {
+  background: var(--win95-gray);
+  border: 1px outset var(--win95-gray);
+  width: 16px;
+}
+
+.win95-scrollbar-thumb {
+  background: var(--win95-dark-gray);
+  border: 1px outset var(--win95-dark-gray);
+  min-height: 20px;
 }
 
 /* Custom animations */
@@ -63,4 +200,28 @@ body {
   transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 150ms;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .win95-window {
+    margin: 8px;
+    border-width: 1px;
+  }
+  
+  .win95-button {
+    font-size: 10px;
+    padding: 6px 12px;
+    min-height: 32px;
+  }
+  
+  .win95-table {
+    font-size: 10px;
+  }
+  
+  .win95-table th,
+  .win95-table td {
+    padding: 2px 4px;
+    font-size: 10px;
+  }
 }
