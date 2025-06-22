@@ -1,9 +1,9 @@
 'use client';
 
 interface NetworkStats {
-  latestBlock: any;
-  currentEpoch: any;
-  totalValidators: any;
+  latestBlock: string;
+  currentEpoch: number;
+  totalValidators: number;
 }
 
 interface NetworkStatsCardProps {
@@ -42,7 +42,7 @@ export default function NetworkStatsCard({ stats, pollingInterval = 10000 }: Net
   };
 
   const blockStatus = getBlockStatus(parseInt(stats.latestBlock));
-  const epochProgress = getEpochProgress(parseInt(stats.currentEpoch));
+  const epochProgress = getEpochProgress(stats.currentEpoch);
 
   return (
     <div className="card">
@@ -66,7 +66,7 @@ export default function NetworkStatsCard({ stats, pollingInterval = 10000 }: Net
               <div className="stat-icon blue">📦</div>
             </div>
             <div className="stat-value">
-              {formatNumber(stats.latestBlock)}
+              {formatNumber(parseInt(stats.latestBlock))}
             </div>
             <div className="stat-label">Latest Block</div>
             <div className="stat-description">

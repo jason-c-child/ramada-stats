@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
+import { useMemo, useRef, useCallback } from 'react';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -32,7 +32,7 @@ interface TimeSeriesChartProps {
   yAxisLabel?: string;
   formatValue?: (value: number) => string;
   autoScale?: boolean;
-  onChartReady?: (chart: any) => void;
+  onChartReady?: (chart: ChartJS | null) => void;
   timeframe?: '1h' | '6h' | '24h' | '7d' | '30d' | 'all';
   showTrendLine?: boolean;
   showMovingAverage?: boolean;
@@ -52,7 +52,7 @@ export default function TimeSeriesChart({
   showMovingAverage = false,
   movingAveragePeriod = 7
 }: TimeSeriesChartProps) {
-  const chartRef = useRef<any>(null);
+  const chartRef = useRef<ChartJS | null>(null);
   
   console.log('TimeSeriesChart received data:', { 
     title, 
@@ -266,7 +266,7 @@ export default function TimeSeriesChart({
         borderColor: '#000',
         borderWidth: 1,
         callbacks: {
-          label: function(context: any) {
+          label: function(context: { dataset: { label: string }; parsed: { y: number } }) {
             return `${context.dataset.label}: ${formatValue(context.parsed.y)}`;
           },
         },
@@ -300,7 +300,7 @@ export default function TimeSeriesChart({
           font: {
             size: 10,
           },
-          callback: function(value: any) {
+          callback: function(value: number) {
             return formatValue(value);
           },
         },
@@ -321,7 +321,7 @@ export default function TimeSeriesChart({
     },
   };
 
-  const handleChartRef = useCallback((chart: any) => {
+  const handleChartRef = useCallback((chart: ChartJS | null) => {
     console.log('TimeSeriesChart: Chart ref callback called for', title, 'with chart:', chart);
     if (chart) {
       chartRef.current = chart;

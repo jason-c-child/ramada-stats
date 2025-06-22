@@ -51,7 +51,6 @@ export default function TransferFlowNetwork({
   const [searchQuery, setSearchQuery] = useState('');
   const [showFilters, setShowFilters] = useState(false);
   const [selectedFlow, setSelectedFlow] = useState<TransferFlow | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   // Mock data for transfer flows
@@ -137,7 +136,7 @@ export default function TransferFlowNetwork({
     if (canvasRef.current && activeTab === 'network') {
       drawNetworkGraph();
     }
-  }, [activeTab, selectedTimeframe]);
+  }, [activeTab, selectedTimeframe, drawNetworkGraph]);
 
   const drawNetworkGraph = () => {
     const canvas = canvasRef.current;

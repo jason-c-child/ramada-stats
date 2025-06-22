@@ -159,5 +159,5 @@ export const timeSeriesStore = new TimeSeriesStore();
 
 // Make it available globally for the Control Panel
 if (typeof window !== 'undefined') {
-  (window as any).timeSeriesStore = timeSeriesStore;
+  (window as { timeSeriesStore?: typeof timeSeriesStore }).timeSeriesStore = timeSeriesStore;
 } 

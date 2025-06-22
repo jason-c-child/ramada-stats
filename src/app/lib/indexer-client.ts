@@ -61,16 +61,16 @@ class NamadaIndexerClient {
     try {
       console.log('Trying primary endpoint...');
       return await requestFn(this.primaryClient);
-    } catch (primaryError: any) {
-      console.warn('Primary endpoint failed, trying backups:', primaryError.message);
+    } catch (primaryError: unknown) {
+      console.warn('Primary endpoint failed, trying backups:', (primaryError as Error).message);
       
       // Try backup endpoints
       for (const [index, backupClient] of this.backupClients.entries()) {
         try {
           console.log(`Trying backup endpoint ${index + 1}...`);
           return await requestFn(backupClient);
-        } catch (backupError: any) {
-          console.warn(`Backup ${index + 1} failed:`, backupError.message);
+        } catch (backupError: unknown) {
+          console.warn(`Backup ${index + 1} failed:`, (backupError as Error).message);
         }
       }
       
@@ -127,8 +127,8 @@ class NamadaIndexerClient {
       .slice(0, 10)
       .map(validator => ({
         ...validator,
-        name: this.getValidatorName(validator.address),
-        commission: this.getValidatorCommission(validator.address),
+        name: this.getValidatorName(),
+        commission: this.getValidatorCommission(),
         status: validator.voting_power !== '0' ? 'Active' : 'Inactive'
       }));
 
@@ -150,23 +150,23 @@ class NamadaIndexerClient {
     
     return validators.map(validator => ({
       ...validator,
-      name: this.getValidatorName(validator.address),
-      commission: this.getValidatorCommission(validator.address),
+      name: this.getValidatorName(),
+      commission: this.getValidatorCommission(),
       status: validator.voting_power !== '0' ? 'Active' : 'Inactive'
     }));
   }
 
-  private getValidatorName(address: string): string {
+  private getValidatorName(): string {
     // This would ideally come from a validator registry or API
     // For now, we'll use a simple mapping or truncate the address
     const knownValidators: { [key: string]: string } = {
       // Add known validator names here
     };
     
-    return knownValidators[address] || `${address.slice(0, 8)}...${address.slice(-6)}`;
+    return 'Validator';
   }
 
-  private getValidatorCommission(address: string): string {
+  private getValidatorCommission(): string {
     // This would come from validator metadata
     // For now, return a placeholder
     return '5.0%';

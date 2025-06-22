@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 
 interface Alert {
   id: string;
@@ -40,11 +40,37 @@ interface AlertSystemProps {
 }
 
 interface NetworkData {
-  networkStats?: any;
-  validatorStats?: any;
-  privacyMetrics?: any;
-  governance?: any;
-  crossChain?: any;
+  networkStats?: {
+    latestBlock?: number;
+    totalTransactions?: number;
+    activeValidators?: number;
+    totalStaked?: number;
+  };
+  validatorStats?: {
+    totalVotingPower?: number;
+    totalValidators?: number;
+    averageCommission?: number;
+    activeValidators?: number;
+  };
+  privacyMetrics?: {
+    totalShieldedBalance?: number;
+    shieldedTransactions?: number;
+    privacyScore?: number;
+  };
+  governance?: {
+    stats?: {
+      activeProposals?: number;
+      totalProposals?: number;
+      participationRate?: number;
+    };
+  };
+  crossChain?: {
+    bridgeActivity?: {
+      totalTransfers?: number;
+      totalVolume?: number;
+      activeBridges?: number;
+    };
+  };
 }
 
 export default function AlertSystem({
@@ -76,7 +102,7 @@ export default function AlertSystem({
   const [alertTriggers, setAlertTriggers] = useState<AlertTrigger[]>([]);
   const [isChecking, setIsChecking] = useState(false);
   const [lastCheckTime, setLastCheckTime] = useState<Date | null>(null);
-  const [checkInterval, setCheckInterval] = useState(30000); // 30 seconds default
+  const [checkInterval] = useState(30000); // 30 seconds default
   const [webhookStatus, setWebhookStatus] = useState<{[key: string]: 'success' | 'error' | 'pending'}>({});
   
   const checkIntervalRef = useRef<NodeJS.Timeout | null>(null);
@@ -114,23 +140,6 @@ export default function AlertSystem({
   useEffect(() => {
     localStorage.setItem('namada-alert-triggers', JSON.stringify(alertTriggers));
   }, [alertTriggers]);
-
-  // Start alert checking interval
-  useEffect(() => {
-    if (checkIntervalRef.current) {
-      clearInterval(checkIntervalRef.current);
-    }
-
-    checkIntervalRef.current = setInterval(() => {
-      checkAlerts();
-    }, checkInterval);
-
-    return () => {
-      if (checkIntervalRef.current) {
-        clearInterval(checkIntervalRef.current);
-      }
-    };
-  }, [alerts, checkInterval]);
 
   const fetchNetworkData = async (): Promise<NetworkData> => {
     try {
@@ -396,6 +405,23 @@ export default function AlertSystem({
       setIsChecking(false);
     }
   };
+
+  // Start alert checking interval
+  useEffect(() => {
+    if (checkIntervalRef.current) {
+      clearInterval(checkIntervalRef.current);
+    }
+
+    checkIntervalRef.current = setInterval(() => {
+      checkAlerts();
+    }, checkInterval);
+
+    return () => {
+      if (checkIntervalRef.current) {
+        clearInterval(checkIntervalRef.current);
+      }
+    };
+  }, [alerts, checkInterval, checkAlerts]);
 
   const createAlert = () => {
     if (!newAlert.name || !newAlert.description || newAlert.threshold === undefined) {

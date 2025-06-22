@@ -16,9 +16,9 @@ import AlertSystem from './AlertSystem';
 import TransferFlowNetwork from './TransferFlowNetwork';
 
 interface NetworkStats {
-  latestBlock: any;
-  currentEpoch: any;
-  totalValidators: any;
+  latestBlock: string;
+  currentEpoch: number;
+  totalValidators: number;
   blockTime?: string;
 }
 

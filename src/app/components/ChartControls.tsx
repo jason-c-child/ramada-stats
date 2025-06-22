@@ -1,7 +1,5 @@
 'use client';
 
-import { useState } from 'react';
-
 interface ChartControlsProps {
   timeframe: '1h' | '6h' | '24h' | '7d' | '30d' | 'all';
   onTimeframeChange: (timeframe: '1h' | '6h' | '24h' | '7d' | '30d' | 'all') => void;
@@ -44,7 +42,7 @@ export default function ChartControls({
           <label className="block text-black text-sm font-bold mb-2">Timeframe</label>
           <select
             value={timeframe}
-            onChange={(e) => onTimeframeChange(e.target.value as any)}
+            onChange={(e) => onTimeframeChange(e.target.value as '1h' | '6h' | '24h' | '7d' | '30d' | 'all')}
             className="win95-select w-full"
           >
             {timeframes.map(tf => (

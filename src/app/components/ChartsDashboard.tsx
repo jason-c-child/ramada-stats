@@ -15,7 +15,7 @@ export default function ChartsDashboard() {
     averageVotingPower: [],
   });
   const [updateCounter, setUpdateCounter] = useState(0);
-  const chartRefs = useRef<{ [key: string]: any }>({});
+  const chartRefs = useRef<{ [key: string]: unknown }>({});
 
   // Chart control states
   const [timeframe, setTimeframe] = useState<'1h' | '6h' | '24h' | '7d' | '30d' | 'all'>('all');
@@ -50,25 +50,26 @@ export default function ChartsDashboard() {
     setIsMaximized(!isMaximized);
   };
 
-  const handleChartReady = (chartId: string, chart: any) => {
+  const handleChartReady = (chartId: string, chart: unknown) => {
     chartRefs.current[chartId] = chart;
   };
 
   const resetAllCharts = () => {
     Object.values(chartRefs.current).forEach(chart => {
-      if (chart && chart.resetZoom) {
-        chart.resetZoom();
-      } else if (chart && chart.scales) {
+      const chartObj = chart as { resetZoom?: () => void; scales?: { x?: { min?: number | null; max?: number | null }; y?: { min?: number | null; max?: number | null } }; update?: (mode: string) => void };
+      if (chartObj && chartObj.resetZoom) {
+        chartObj.resetZoom();
+      } else if (chartObj && chartObj.scales) {
         // Manual reset if resetZoom is not available
-        if (chart.scales.x && typeof chart.scales.x.min === 'number') {
-          chart.scales.x.min = null;
-          chart.scales.x.max = null;
+        if (chartObj.scales.x && typeof chartObj.scales.x.min === 'number') {
+          chartObj.scales.x.min = null;
+          chartObj.scales.x.max = null;
         }
-        if (chart.scales.y && typeof chart.scales.y.min === 'number') {
-          chart.scales.y.min = null;
-          chart.scales.y.max = null;
+        if (chartObj.scales.y && typeof chartObj.scales.y.min === 'number') {
+          chartObj.scales.y.min = null;
+          chartObj.scales.y.max = null;
         }
-        chart.update('none');
+        chartObj.update?.('none');
       }
     });
   };

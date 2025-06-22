@@ -106,7 +106,6 @@ const generateCrossChainData = () => ({
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const endpoint = searchParams.get('endpoint');
-  const timeframe = searchParams.get('timeframe') || '24h';
   const limit = parseInt(searchParams.get('limit') || '100');
 
   try {
@@ -326,7 +325,6 @@ export async function POST(request: NextRequest) {
 
 // Transfer Flow Network functions
 async function getTransferFlows(searchParams: URLSearchParams) {
-  const timeframe = searchParams.get('timeframe') || '24h';
   const token = searchParams.get('token') || 'all';
   const status = searchParams.get('status') || 'all';
   const limit = parseInt(searchParams.get('limit') || '50');
@@ -575,8 +573,6 @@ async function getNetworkNodes(searchParams: URLSearchParams) {
 }
 
 async function getFlowMetrics(searchParams: URLSearchParams) {
-  const timeframe = searchParams.get('timeframe') || '24h';
-
   // Mock metrics data
   const mockMetrics = {
     totalTransfers: 1250,

@@ -3,7 +3,7 @@ import Dashboard from './components/Dashboard';
 function ErrorBoundary({ children }: { children: React.ReactNode }) {
   try {
     return <>{children}</>;
-  } catch (error) {
+  } catch {
     return (
       <div className="min-h-screen bg-gray-100 flex items-center justify-center">
         <div className="text-center">
