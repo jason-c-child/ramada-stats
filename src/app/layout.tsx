@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Namada Analytics Dashboard",
+  title: "Blockchain Analytics Dashboard",
   description: "Real-time blockchain analytics and network insights for Namada",
 };
 
