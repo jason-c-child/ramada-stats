@@ -141,47 +141,9 @@ export default function AlertSystem({
   }, [alertTriggers]);
 
   const fetchNetworkData = async (): Promise<NetworkData> => {
-    try {
-      const [networkResponse, validatorResponse, privacyResponse, governanceResponse, crossChainResponse] = await Promise.all([
-        fetch('/api/analytics?endpoint=network-stats'),
-        fetch('/api/analytics?endpoint=validator-stats'),
-        fetch('/api/analytics?endpoint=privacy-metrics'),
-        fetch('/api/analytics?endpoint=governance'),
-        fetch('/api/analytics?endpoint=cross-chain')
-      ]);
-
-      const data: NetworkData = {};
-      
-      if (networkResponse.ok) {
-        const result = await networkResponse.json();
-        data.networkStats = result.data;
-      }
-      
-      if (validatorResponse.ok) {
-        const result = await validatorResponse.json();
-        data.validatorStats = result.data;
-      }
-      
-      if (privacyResponse.ok) {
-        const result = await privacyResponse.json();
-        data.privacyMetrics = result.data;
-      }
-      
-      if (governanceResponse.ok) {
-        const result = await governanceResponse.json();
-        data.governance = result.data;
-      }
-      
-      if (crossChainResponse.ok) {
-        const result = await crossChainResponse.json();
-        data.crossChain = result.data;
-      }
-
-      return data;
-    } catch (error) {
-      console.error('Error fetching network data:', error);
-      return {};
-    }
+    // Real data sources are not configured - alerts require actual network data
+    console.warn('Alert system requires real data sources that are not currently configured');
+    return {};
   };
 
   const getCurrentValue = (alert: Alert, data: NetworkData): number | null => {
@@ -744,6 +706,20 @@ export default function AlertSystem({
       </div>
       
       <div className="p-3 sm:p-4 md:p-6">
+        {/* Data Source Notice */}
+        <div className="win95-window-inset p-4 mb-4 bg-yellow-50 border-yellow-300">
+          <div className="flex items-center space-x-2 mb-2">
+            <div className="w-4 h-4 bg-yellow-500 border border-black"></div>
+            <h3 className="text-sm font-bold text-black">Data Source Required</h3>
+          </div>
+          <p className="text-xs text-black mb-2">
+            Alert system requires real network data sources that are not currently configured.
+          </p>
+          <p className="text-xs text-gray-600">
+            To enable alerts, configure real data APIs for network stats, validator metrics, privacy data, governance, and cross-chain analytics.
+          </p>
+        </div>
+
         {/* Header with Create Button */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6 space-y-3 sm:space-y-0">
           <div>

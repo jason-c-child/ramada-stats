@@ -4,10 +4,10 @@ import { useState, useEffect, useRef } from 'react';
 import { indexerClient, ValidatorStats } from '../lib/indexer-client';
 import { timeSeriesStore } from '../lib/time-series-store';
 import { useTheme } from '../contexts/ThemeContext';
+import { useGlobal } from '../contexts/GlobalContext';
 import NetworkStatsCard from './NetworkStatsCard';
 import ValidatorStatsCard from './ValidatorStatsCard';
 import ChartsDashboard from './ChartsDashboard';
-import ControlPanel from './ControlPanel';
 import ValidatorExplorer from './ValidatorExplorer';
 import AlertSystem from './AlertSystem';
 
@@ -20,38 +20,23 @@ interface NetworkStats {
 
 export default function Dashboard() {
   const { theme } = useTheme();
+  const { pollingIntervals, localStorageEnabled } = useGlobal();
   const [networkStats, setNetworkStats] = useState<NetworkStats | null>(null);
   const [validatorStats, setValidatorStats] = useState<ValidatorStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
   const [isMinimized, setIsMinimized] = useState(false);
-  const [pollingInterval, setPollingInterval] = useState(10000); // Default 10 seconds
-  const [localStorageEnabled, setLocalStorageEnabled] = useState(false);
-  const [isClient, setIsClient] = useState(false);
   const lastBlockTimeRef = useRef<Date | null>(null);
+  const [formattedTime, setFormattedTime] = useState('');
   
   // Component minimize/maximize states
   const [validatorExplorerMinimized, setValidatorExplorerMinimized] = useState(false);
   const [alertSystemMinimized, setAlertSystemMinimized] = useState(false);
 
   useEffect(() => {
-    setIsClient(true);
-    
-    // Load settings from localStorage only on client
-    const savedInterval = localStorage.getItem('namada-polling-interval');
-    const savedLocalStorage = localStorage.getItem('namada-local-storage-enabled');
-    
-    if (savedInterval) {
-      setPollingInterval(parseInt(savedInterval));
-    }
-    
-    if (savedLocalStorage) {
-      const enabled = JSON.parse(savedLocalStorage);
-      setLocalStorageEnabled(enabled);
-      timeSeriesStore.setConfig({ localStorageEnabled: enabled });
-    }
-  }, []);
+    if (lastUpdate) setFormattedTime(lastUpdate.toLocaleTimeString());
+  }, [lastUpdate]);
 
   useEffect(() => {
     let isMounted = true;
@@ -116,27 +101,21 @@ export default function Dashboard() {
     };
 
     fetchData();
-    const interval = setInterval(fetchData, pollingInterval);
+    const interval = setInterval(fetchData, pollingIntervals.namada);
     
     return () => {
       isMounted = false;
       clearInterval(interval);
     };
-  }, [pollingInterval]);
+  }, [pollingIntervals.namada]);
+
+  useEffect(() => {
+    // Update time series store config when global localStorage setting changes
+    timeSeriesStore.setConfig({ localStorageEnabled });
+  }, [localStorageEnabled]);
 
   const handleMinimize = () => {
     setIsMinimized(!isMinimized);
-  };
-
-  const handlePollingIntervalChange = (newInterval: number) => {
-    setPollingInterval(newInterval);
-    localStorage.setItem('namada-polling-interval', newInterval.toString());
-  };
-
-  const handleLocalStorageToggle = (enabled: boolean) => {
-    setLocalStorageEnabled(enabled);
-    localStorage.setItem('namada-local-storage-enabled', JSON.stringify(enabled));
-    timeSeriesStore.setConfig({ localStorageEnabled: enabled });
   };
 
   if (error && !networkStats) {
@@ -240,7 +219,7 @@ export default function Dashboard() {
             ) : networkStats && validatorStats ? (
               <div className="space-y-3 sm:space-y-4 md:space-y-6">
                 {/* Core Network Stats */}
-                <NetworkStatsCard stats={networkStats} pollingInterval={pollingInterval} />
+                <NetworkStatsCard stats={networkStats} pollingInterval={pollingIntervals.namada} />
                 <ValidatorStatsCard stats={validatorStats} />
                 
                 {/* Charts Dashboard */}
@@ -256,6 +235,13 @@ export default function Dashboard() {
                       <li>Validator information and voting power</li>
                       <li>Time series charts of network metrics</li>
                       <li>Validator explorer with real validator data</li>
+                    </ul>
+                    <p className="mt-2 mb-2">Solana dashboards are also available with:</p>
+                    <ul className="list-disc list-inside space-y-1 ml-2 sm:ml-4">
+                      <li>Solana network statistics (slot, epoch, TPS, validators)</li>
+                      <li>Market data (price, market cap, circulating supply)</li>
+                      <li>Time series charts for Solana metrics</li>
+                      <li>Real-time performance monitoring</li>
                     </ul>
                     <p className="mt-2 text-gray-600">
                       Advanced features like governance, privacy metrics, and cross-chain analytics require additional APIs that are not currently available.
@@ -274,22 +260,12 @@ export default function Dashboard() {
                   onMinimize={() => setValidatorExplorerMinimized(!validatorExplorerMinimized)}
                 />
                 
-                {/* Control Panel */}
-                {isClient && (
-                  <ControlPanel
-                    onPollingIntervalChange={handlePollingIntervalChange}
-                    onLocalStorageToggle={handleLocalStorageToggle}
-                    currentPollingInterval={pollingInterval}
-                    localStorageEnabled={localStorageEnabled}
-                  />
-                )}
-                
                 {/* Status Bar */}
                 <div className="win95-status-bar flex flex-col sm:flex-row items-start sm:items-center justify-between space-y-1 sm:space-y-0 p-2 sm:p-3">
-                  <span className="text-xs sm:text-sm">Last updated: {lastUpdate ? lastUpdate.toLocaleTimeString() : 'Unknown'}</span>
+                  <span className="text-xs sm:text-sm">Last updated: {formattedTime || 'Unknown'}</span>
                   <span className="flex items-center text-xs sm:text-sm">
                     <div className="w-2 h-2 bg-[#008000] border border-black mr-2"></div>
-                    Live data (updates every {pollingInterval / 1000}s)
+                    Live data (updates every {pollingIntervals.namada / 1000}s)
                   </span>
                 </div>
               </div>
