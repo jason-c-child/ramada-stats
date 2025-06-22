@@ -36,7 +36,7 @@ export default function ValidatorStatsCard({ stats }: { stats: ValidatorStats })
           </div>
           <div className="flex space-x-1">
             <button onClick={handleMinimize} className="win95-button text-xs px-2 py-1">□</button>
-            <button onClick={handleMaximize} className="win95-button text-xs px-2 py-1">□</button>
+            
           </div>
         </div>
       </div>
@@ -52,7 +52,7 @@ export default function ValidatorStatsCard({ stats }: { stats: ValidatorStats })
         </div>
         <div className="flex space-x-1">
           <button onClick={handleMinimize} className="win95-button text-xs px-2 py-1">_</button>
-          <button onClick={handleMaximize} className="win95-button text-xs px-2 py-1">□</button>
+          
         </div>
       </div>
       

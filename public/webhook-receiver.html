@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Namada Analytics - Webhook Receiver</title>
+    <style>
+        body {
+            font-family: 'Courier New', monospace;
+            background-color: #c0c0c0;
+            margin: 0;
+            padding: 20px;
+            color: #000;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            border: 2px solid #000;
+            box-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        .title-bar {
+            background: linear-gradient(90deg, #000080 0%, #1084d0 100%);
+            color: white;
+            padding: 8px 12px;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .content {
+            padding: 20px;
+        }
+        .webhook-url {
+            background-color: #f0f0f0;
+            border: 1px solid #000;
+            padding: 10px;
+            margin: 10px 0;
+            font-family: monospace;
+            word-break: break-all;
+        }
+        .webhook-list {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #000;
+            background-color: #fff;
+        }
+        .webhook-item {
+            border-bottom: 1px solid #ccc;
+            padding: 10px;
+            margin: 0;
+        }
+        .webhook-item:last-child {
+            border-bottom: none;
+        }
+        .webhook-header {
+            font-weight: bold;
+            color: #000080;
+            margin-bottom: 5px;
+        }
+        .webhook-time {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+        .webhook-data {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 8px;
+            font-size: 12px;
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+        .button {
+            background-color: #c0c0c0;
+            border: 2px outset #fff;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        .button:hover {
+            background-color: #d0d0d0;
+        }
+        .button:active {
+            border: 2px inset #fff;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #000;
+        }
+        .status.success {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+        }
+        .status.error {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="title-bar">
+            <span>🚨 Namada Analytics Webhook Receiver</span>
+            <span>📡 Test Endpoint</span>
+        </div>
+        
+        <div class="content">
+            <h2>Webhook Testing Endpoint</h2>
+            <p>This page receives webhook notifications from the Namada Analytics Dashboard. Use this URL in your alert configuration to test webhooks:</p>
+            
+            <div class="webhook-url" id="webhookUrl">
+                Loading...
+            </div>
+            
+            <div class="status success">
+                ✅ Webhook receiver is active and ready to receive notifications
+            </div>
+            
+            <div style="margin: 20px 0;">
+                <button class="button" onclick="clearWebhooks()">Clear All Webhooks</button>
+                <button class="button" onclick="copyUrl()">Copy URL</button>
+                <button class="button" onclick="testWebhook()">Send Test Webhook</button>
+            </div>
+            
+            <h3>Received Webhooks (<span id="webhookCount">0</span>)</h3>
+            <div class="webhook-list" id="webhookList">
+                <div style="text-align: center; padding: 20px; color: #666;">
+                    No webhooks received yet...
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let webhooks = [];
+        const webhookUrl = window.location.href;
+        
+        document.getElementById('webhookUrl').textContent = webhookUrl;
+        
+        // Check for webhook data in URL parameters
+        function checkForWebhookData() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const webhookData = urlParams.get('webhook');
+            
+            if (webhookData) {
+                try {
+                    const data = JSON.parse(decodeURIComponent(webhookData));
+                    addWebhook(data);
+                    
+                    // Clean up URL
+                    const newUrl = window.location.pathname;
+                    window.history.replaceState({}, document.title, newUrl);
+                } catch (error) {
+                    console.error('Error parsing webhook data:', error);
+                }
+            }
+        }
+        
+        function addWebhook(data) {
+            const webhook = {
+                id: Date.now(),
+                timestamp: new Date().toISOString(),
+                data: data
+            };
+            
+            webhooks.unshift(webhook);
+            updateWebhookDisplay();
+            
+            // Store in localStorage
+            localStorage.setItem('namada-webhooks', JSON.stringify(webhooks));
+        }
+        
+        function updateWebhookDisplay() {
+            const list = document.getElementById('webhookList');
+            const count = document.getElementById('webhookCount');
+            
+            count.textContent = webhooks.length;
+            
+            if (webhooks.length === 0) {
+                list.innerHTML = '<div style="text-align: center; padding: 20px; color: #666;">No webhooks received yet...</div>';
+                return;
+            }
+            
+            list.innerHTML = webhooks.map(webhook => `
+                <div class="webhook-item">
+                    <div class="webhook-header">Webhook #${webhook.id}</div>
+                    <div class="webhook-time">${new Date(webhook.timestamp).toLocaleString()}</div>
+                    <div class="webhook-data">${JSON.stringify(webhook.data, null, 2)}</div>
+                </div>
+            `).join('');
+        }
+        
+        function clearWebhooks() {
+            webhooks = [];
+            localStorage.removeItem('namada-webhooks');
+            updateWebhookDisplay();
+        }
+        
+        function copyUrl() {
+            navigator.clipboard.writeText(webhookUrl).then(() => {
+                alert('Webhook URL copied to clipboard!');
+            }).catch(() => {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = webhookUrl;
+                document.body.appendChild(textArea);
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                alert('Webhook URL copied to clipboard!');
+            });
+        }
+        
+        function testWebhook() {
+            const testData = {
+                alert: {
+                    id: 'test-alert',
+                    name: 'Test Alert',
+                    description: 'Test webhook notification',
+                    type: 'block-height',
+                    condition: 'above',
+                    threshold: 1000000
+                },
+                trigger: {
+                    id: `test-${Date.now()}`,
+                    message: 'Test webhook notification from Namada Analytics Dashboard',
+                    value: 1000001,
+                    timestamp: Date.now()
+                },
+                network: {
+                    timestamp: new Date().toISOString(),
+                    source: 'Namada Analytics Dashboard'
+                }
+            };
+            
+            addWebhook(testData);
+        }
+        
+        // Load webhooks from localStorage on page load
+        window.addEventListener('load', () => {
+            const saved = localStorage.getItem('namada-webhooks');
+            if (saved) {
+                try {
+                    webhooks = JSON.parse(saved);
+                    updateWebhookDisplay();
+                } catch (error) {
+                    console.error('Error loading saved webhooks:', error);
+                }
+            }
+            
+            checkForWebhookData();
+        });
+        
+        // Handle webhook POST requests (if this were a real server)
+        // For now, we'll use URL parameters for testing
+        if (window.location.search.includes('webhook=')) {
+            checkForWebhookData();
+        }
+    </script>
+</body>
+</html> 

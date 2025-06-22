@@ -10,10 +10,9 @@ import {
   Title,
   Tooltip,
   Legend,
-  TimeScale,
+  Filler,
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
-import 'chartjs-adapter-date-fns';
 
 ChartJS.register(
   CategoryScale,
@@ -23,7 +22,7 @@ ChartJS.register(
   Title,
   Tooltip,
   Legend,
-  TimeScale
+  Filler
 );
 
 interface TimeSeriesChartProps {
@@ -34,6 +33,10 @@ interface TimeSeriesChartProps {
   formatValue?: (value: number) => string;
   autoScale?: boolean;
   onChartReady?: (chart: any) => void;
+  timeframe?: '1h' | '6h' | '24h' | '7d' | '30d' | 'all';
+  showTrendLine?: boolean;
+  showMovingAverage?: boolean;
+  movingAveragePeriod?: number;
 }
 
 export default function TimeSeriesChart({ 
@@ -43,20 +46,88 @@ export default function TimeSeriesChart({
   yAxisLabel = 'Value',
   formatValue = (value: number) => value.toString(),
   autoScale = true,
-  onChartReady
+  onChartReady,
+  timeframe = 'all',
+  showTrendLine = false,
+  showMovingAverage = false,
+  movingAveragePeriod = 7
 }: TimeSeriesChartProps) {
   const chartRef = useRef<any>(null);
   
-  console.log('TimeSeriesChart received data:', { title, data, dataLength: data.length });
+  console.log('TimeSeriesChart received data:', { 
+    title, 
+    data, 
+    dataLength: data.length,
+    dataValues: data.map(d => ({ timestamp: d.timestamp, value: d.value }))
+  });
+
+  // Filter data based on timeframe
+  const filteredData = useMemo(() => {
+    if (timeframe === 'all') return data;
+    
+    const now = Date.now();
+    const timeframes = {
+      '1h': 60 * 60 * 1000,
+      '6h': 6 * 60 * 60 * 1000,
+      '24h': 24 * 60 * 60 * 1000,
+      '7d': 7 * 24 * 60 * 60 * 1000,
+      '30d': 30 * 24 * 60 * 60 * 1000,
+    };
+    
+    const cutoff = now - timeframes[timeframe];
+    return data.filter(point => point.timestamp >= cutoff);
+  }, [data, timeframe]);
+
+  // Calculate moving average
+  const movingAverageData = useMemo(() => {
+    if (!showMovingAverage || filteredData.length < movingAveragePeriod) return [];
+    
+    const result = [];
+    for (let i = movingAveragePeriod - 1; i < filteredData.length; i++) {
+      const sum = filteredData
+        .slice(i - movingAveragePeriod + 1, i + 1)
+        .reduce((acc, point) => acc + point.value, 0);
+      const average = sum / movingAveragePeriod;
+      result.push({
+        timestamp: filteredData[i].timestamp,
+        value: average
+      });
+    }
+    return result;
+  }, [filteredData, showMovingAverage, movingAveragePeriod]);
+
+  // Calculate trend line
+  const trendLineData = useMemo(() => {
+    if (!showTrendLine || filteredData.length < 2) return [];
+    
+    const n = filteredData.length;
+    const sumX = filteredData.reduce((acc, _, i) => acc + i, 0);
+    const sumY = filteredData.reduce((acc, point) => acc + point.value, 0);
+    const sumXY = filteredData.reduce((acc, point, i) => acc + i * point.value, 0);
+    const sumXX = filteredData.reduce((acc, _, i) => acc + i * i, 0);
+    
+    const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
+    const intercept = (sumY - slope * sumX) / n;
+    
+    return filteredData.map((point, i) => ({
+      timestamp: point.timestamp,
+      value: slope * i + intercept
+    }));
+  }, [filteredData, showTrendLine]);
 
   // Calculate y-axis range for better scaling
   const yAxisRange = useMemo(() => {
-    if (data.length === 0) return { min: 0, max: 100 };
+    if (data.length === 0) {
+      console.log('TimeSeriesChart: No data, using default range');
+      return { min: 0, max: 100 };
+    }
     
     const values = data.map(point => point.value);
     const min = Math.min(...values);
     const max = Math.max(...values);
     const range = max - min;
+    
+    console.log('TimeSeriesChart: Y-axis range calculation:', { min, max, range, values });
     
     // If range is very small, expand it to make changes visible
     if (range === 0) {
@@ -92,37 +163,85 @@ export default function TimeSeriesChart({
 
   // Use useMemo to create chart data and ensure it updates when data changes
   const chartData = useMemo(() => {
-    if (data.length === 0) {
+    console.log('TimeSeriesChart: Processing chart data for', title, 'with', filteredData.length, 'points');
+    
+    if (filteredData.length === 0) {
+      console.log('TimeSeriesChart: No data, returning empty datasets');
       return {
+        labels: [],
         datasets: []
       };
     }
 
+    const datasets = [
+      {
+        label: title,
+        data: filteredData.map(point => point.value),
+        borderColor: color,
+        backgroundColor: color + '20',
+        borderWidth: 2,
+        fill: true,
+        tension: 0.4,
+        pointRadius: 3,
+        pointHoverRadius: 6,
+        pointBackgroundColor: color,
+        pointBorderColor: '#000',
+        pointBorderWidth: 1,
+      }
+    ];
+
+    // Add moving average dataset
+    if (showMovingAverage && movingAverageData.length > 0) {
+      datasets.push({
+        label: `${title} (${movingAveragePeriod}-point MA)`,
+        data: movingAverageData.map(point => point.value),
+        borderColor: '#ff6b6b',
+        backgroundColor: 'transparent',
+        borderWidth: 2,
+        fill: false,
+        tension: 0.1,
+        pointRadius: 0,
+        pointHoverRadius: 4,
+        pointBackgroundColor: '#ff6b6b',
+        pointBorderColor: '#000',
+        pointBorderWidth: 1,
+        borderDash: [5, 5],
+      });
+    }
+
+    // Add trend line dataset
+    if (showTrendLine && trendLineData.length > 0) {
+      datasets.push({
+        label: `${title} (Trend)`,
+        data: trendLineData.map(point => point.value),
+        borderColor: '#4ecdc4',
+        backgroundColor: 'transparent',
+        borderWidth: 2,
+        fill: false,
+        tension: 0,
+        pointRadius: 0,
+        pointHoverRadius: 4,
+        pointBackgroundColor: '#4ecdc4',
+        pointBorderColor: '#000',
+        pointBorderWidth: 1,
+        borderDash: [10, 5],
+      });
+    }
+
     const processedData = {
-      datasets: [
-        {
-          label: title,
-          data: data.map(point => ({
-            x: new Date(point.timestamp),
-            y: point.value
-          })),
-          borderColor: color,
-          backgroundColor: color + '20',
-          borderWidth: 2,
-          fill: true,
-          tension: 0.4,
-          pointRadius: 3,
-          pointHoverRadius: 6,
-          pointBackgroundColor: color,
-          pointBorderColor: '#000',
-          pointBorderWidth: 1,
-        },
-      ],
+      labels: filteredData.map((_, index) => `Point ${index + 1}`),
+      datasets
     };
 
-    console.log('TimeSeriesChart processed chart data:', processedData);
+    console.log('TimeSeriesChart processed chart data:', {
+      title,
+      datasetCount: processedData.datasets.length,
+      dataPoints: processedData.datasets[0].data.length,
+      firstPoint: processedData.datasets[0].data[0],
+      lastPoint: processedData.datasets[0].data[processedData.datasets[0].data.length - 1]
+    });
     return processedData;
-  }, [data, title, color]);
+  }, [filteredData, title, color, showMovingAverage, movingAverageData, showTrendLine, trendLineData, movingAveragePeriod]);
 
   const options = {
     responsive: true,
@@ -155,15 +274,7 @@ export default function TimeSeriesChart({
     },
     scales: {
       x: {
-        type: 'time' as const,
-        time: {
-          unit: 'minute' as const,
-          displayFormats: {
-            minute: 'HH:mm',
-            hour: 'HH:mm',
-            day: 'MMM dd',
-          },
-        },
+        type: 'category' as const,
         grid: {
           color: '#000',
           borderColor: '#000',
@@ -211,29 +322,37 @@ export default function TimeSeriesChart({
   };
 
   const handleChartRef = useCallback((chart: any) => {
+    console.log('TimeSeriesChart: Chart ref callback called for', title, 'with chart:', chart);
     if (chart) {
       chartRef.current = chart;
       if (onChartReady) {
         onChartReady(chart);
       }
     }
-  }, [onChartReady]);
+  }, [onChartReady, title]);
 
-  if (data.length === 0) {
-    return (
-      <div className="win95-window-inset p-8 text-center">
-        <div className="text-black">No data available</div>
-      </div>
-    );
-  }
+  console.log('TimeSeriesChart: Rendering chart for', title, 'with', data.length, 'data points');
 
   return (
     <div className="win95-window-inset p-4" style={{ height: '300px' }}>
-      <Line 
-        ref={handleChartRef}
-        data={chartData} 
-        options={options}
-      />
+      {(() => {
+        try {
+          return (
+            <Line 
+              ref={handleChartRef}
+              data={chartData} 
+              options={options}
+            />
+          );
+        } catch (error) {
+          console.error('TimeSeriesChart: Error rendering chart for', title, error);
+          return (
+            <div className="text-red-600 text-center">
+              Error rendering chart: {error instanceof Error ? error.message : 'Unknown error'}
+            </div>
+          );
+        }
+      })()}
     </div>
   );
 } 

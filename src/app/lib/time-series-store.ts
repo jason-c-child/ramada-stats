@@ -1,13 +1,13 @@
-interface TimeSeriesPoint {
-  timestamp: number;
-  value: number;
+export interface TimeSeriesData {
+  blockTime: { timestamp: number; value: number }[];
+  activeValidators: { timestamp: number; value: number }[];
+  totalVotingPower: { timestamp: number; value: number }[];
+  averageVotingPower: { timestamp: number; value: number }[];
 }
 
-interface TimeSeriesData {
-  blockTime: TimeSeriesPoint[];
-  activeValidators: TimeSeriesPoint[];
-  totalVotingPower: TimeSeriesPoint[];
-  averageVotingPower: TimeSeriesPoint[];
+interface TimeSeriesStoreConfig {
+  localStorageEnabled: boolean;
+  maxDataPoints: number;
 }
 
 class TimeSeriesStore {
@@ -17,90 +17,107 @@ class TimeSeriesStore {
     totalVotingPower: [],
     averageVotingPower: [],
   };
+  
+  private subscribers: (() => void)[] = [];
+  private config: TimeSeriesStoreConfig = {
+    localStorageEnabled: false,
+    maxDataPoints: 1000,
+  };
 
-  private maxPoints = 50; // Keep last 50 data points
-  private listeners: (() => void)[] = [];
-  private lastBlockHeight: number | null = null;
-  private lastBlockTime: number | null = null;
+  constructor() {
+    // Only load from localStorage on client side
+    if (typeof window !== 'undefined') {
+      this.loadFromLocalStorage();
+    }
+  }
+
+  private saveToLocalStorage() {
+    if (this.config.localStorageEnabled && typeof window !== 'undefined' && window.localStorage) {
+      try {
+        localStorage.setItem('namada-time-series-data', JSON.stringify(this.data));
+        localStorage.setItem('namada-time-series-config', JSON.stringify(this.config));
+      } catch (error) {
+        console.warn('Failed to save to localStorage:', error);
+      }
+    }
+  }
+
+  private loadFromLocalStorage() {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      try {
+        const savedData = localStorage.getItem('namada-time-series-data');
+        const savedConfig = localStorage.getItem('namada-time-series-config');
+        
+        if (savedData) {
+          this.data = JSON.parse(savedData);
+        }
+        
+        if (savedConfig) {
+          this.config = { ...this.config, ...JSON.parse(savedConfig) };
+        }
+      } catch (error) {
+        console.warn('Failed to load from localStorage:', error);
+      }
+    }
+  }
+
+  private trimData(dataArray: { timestamp: number; value: number }[]) {
+    if (dataArray.length > this.config.maxDataPoints) {
+      return dataArray.slice(-this.config.maxDataPoints);
+    }
+    return dataArray;
+  }
 
   addDataPoint(
     blockHeight: number,
-    blockTime: string,
+    blockTime: number,
     activeValidators: number,
     totalVotingPower: number,
     averageVotingPower: number
   ) {
     const timestamp = Date.now();
-    let blockTimeSeconds = 0;
-
-    // Calculate block time if we have previous data
-    if (this.lastBlockHeight !== null && this.lastBlockTime !== null) {
-      const heightDiff = blockHeight - this.lastBlockHeight;
-      const timeDiff = new Date(blockTime).getTime() - this.lastBlockTime;
-      
-      if (heightDiff > 0 && timeDiff > 0) {
-        blockTimeSeconds = timeDiff / 1000; // Convert to seconds
-      }
-    }
-
-    // Update last values
-    this.lastBlockHeight = blockHeight;
-    this.lastBlockTime = new Date(blockTime).getTime();
-
-    // Add new data points
-    this.data.blockTime.push({ timestamp, value: blockTimeSeconds });
-    this.data.activeValidators.push({ timestamp, value: activeValidators });
-    this.data.totalVotingPower.push({ timestamp, value: totalVotingPower });
-    this.data.averageVotingPower.push({ timestamp, value: averageVotingPower });
-
-    console.log('TimeSeriesStore: Added data point', {
+    
+    console.log('TimeSeriesStore: Adding data point:', {
       timestamp,
       blockHeight,
-      blockTimeSeconds,
+      blockTime,
       activeValidators,
       totalVotingPower,
-      averageVotingPower,
-      totalPoints: this.data.blockTime.length
+      averageVotingPower
+    });
+    
+    // Add block time data
+    this.data.blockTime.push({ timestamp, value: blockTime });
+    this.data.blockTime = this.trimData(this.data.blockTime);
+    
+    // Add active validators data
+    this.data.activeValidators.push({ timestamp, value: activeValidators });
+    this.data.activeValidators = this.trimData(this.data.activeValidators);
+    
+    // Add total voting power data
+    this.data.totalVotingPower.push({ timestamp, value: totalVotingPower });
+    this.data.totalVotingPower = this.trimData(this.data.totalVotingPower);
+    
+    // Add average voting power data
+    this.data.averageVotingPower.push({ timestamp, value: averageVotingPower });
+    this.data.averageVotingPower = this.trimData(this.data.averageVotingPower);
+
+    console.log('TimeSeriesStore: Current data state:', {
+      blockTimeLength: this.data.blockTime.length,
+      activeValidatorsLength: this.data.activeValidators.length,
+      totalVotingPowerLength: this.data.totalVotingPower.length,
+      averageVotingPowerLength: this.data.averageVotingPower.length
     });
 
-    // Keep only the last maxPoints
-    if (this.data.blockTime.length > this.maxPoints) {
-      this.data.blockTime = this.data.blockTime.slice(-this.maxPoints);
-      this.data.activeValidators = this.data.activeValidators.slice(-this.maxPoints);
-      this.data.totalVotingPower = this.data.totalVotingPower.slice(-this.maxPoints);
-      this.data.averageVotingPower = this.data.averageVotingPower.slice(-this.maxPoints);
-    }
-
-    // Notify listeners
-    this.notifyListeners();
+    // Save to localStorage if enabled
+    this.saveToLocalStorage();
+    
+    // Notify subscribers
+    this.subscribers.forEach(callback => callback());
   }
 
-  getData() {
+  getData(): TimeSeriesData {
     return { ...this.data };
-  }
-
-  subscribe(listener: () => void) {
-    console.log('TimeSeriesStore: Adding listener, total listeners:', this.listeners.length + 1);
-    this.listeners.push(listener);
-    return () => {
-      const index = this.listeners.indexOf(listener);
-      if (index > -1) {
-        this.listeners.splice(index, 1);
-        console.log('TimeSeriesStore: Removed listener, total listeners:', this.listeners.length);
-      }
-    };
-  }
-
-  private notifyListeners() {
-    console.log('TimeSeriesStore: Notifying listeners, count:', this.listeners.length);
-    this.listeners.forEach((listener, index) => {
-      try {
-        listener();
-        console.log(`TimeSeriesStore: Listener ${index} notified successfully`);
-      } catch (error) {
-        console.error(`TimeSeriesStore: Error notifying listener ${index}:`, error);
-      }
-    });
   }
 
   clear() {
@@ -110,11 +127,37 @@ class TimeSeriesStore {
       totalVotingPower: [],
       averageVotingPower: [],
     };
-    this.lastBlockHeight = null;
-    this.lastBlockTime = null;
-    this.notifyListeners();
+    
+    if (this.config.localStorageEnabled && typeof window !== 'undefined' && window.localStorage) {
+      localStorage.removeItem('namada-time-series-data');
+    }
+    
+    this.subscribers.forEach(callback => callback());
+  }
+
+  subscribe(callback: () => void) {
+    this.subscribers.push(callback);
+    return () => {
+      const index = this.subscribers.indexOf(callback);
+      if (index > -1) {
+        this.subscribers.splice(index, 1);
+      }
+    };
+  }
+
+  setConfig(config: Partial<TimeSeriesStoreConfig>) {
+    this.config = { ...this.config, ...config };
+    this.saveToLocalStorage();
+  }
+
+  getConfig(): TimeSeriesStoreConfig {
+    return { ...this.config };
   }
 }
 
 export const timeSeriesStore = new TimeSeriesStore();
-export type { TimeSeriesData, TimeSeriesPoint }; 
+
+// Make it available globally for the Control Panel
+if (typeof window !== 'undefined') {
+  (window as any).timeSeriesStore = timeSeriesStore;
+} 
