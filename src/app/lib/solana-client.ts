@@ -1,4 +1,11 @@
-const SOLANA_RPC_URL = '/api/solana';
+// Use different RPC URLs based on environment
+const SOLANA_RPC_URLS = [
+  'https://api.mainnet-beta.solana.com',
+  'https://solana-api.projectserum.com',
+  'https://solana.public-rpc.com',
+  'https://rpc.ankr.com/solana',
+  'https://solana.rpc.extrnode.com'
+];
 
 /**
  * Get current Solana TPS using getRecentPerformanceSamples
@@ -89,43 +96,91 @@ async function solanaRpc(method: string, params?: any) {
     params: params ? [params] : [],
   };
   
-  try {
-    console.log(`SolanaRPC: Making request to ${SOLANA_RPC_URL} with method ${method}`);
+  // If we're on the server, try multiple RPC endpoints with fallback
+  if (typeof window === 'undefined') {
+    let lastError: Error | null = null;
     
-    const res = await fetch(SOLANA_RPC_URL, {
-      method: 'POST',
-      headers: { 
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(body),
-      // Add timeout to prevent hanging requests
-      signal: AbortSignal.timeout(10000), // 10 second timeout
-    });
-    
-    if (!res.ok) {
-      throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    for (const rpcUrl of SOLANA_RPC_URLS) {
+      try {
+        console.log(`SolanaRPC: Trying ${rpcUrl} with method ${method}`);
+        
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+        
+        const res = await fetch(rpcUrl, {
+          method: 'POST',
+          headers: { 
+            'Content-Type': 'application/json',
+            'User-Agent': 'Namada-Analytics-Dashboard/1.0'
+          },
+          body: JSON.stringify(body),
+          signal: controller.signal,
+        });
+        
+        clearTimeout(timeoutId);
+        
+        if (!res.ok) {
+          throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+        }
+        
+        const data = await res.json();
+        
+        if (data.error) {
+          throw new Error(`RPC Error: ${data.error.message}`);
+        }
+        
+        console.log(`SolanaRPC: Success with ${rpcUrl}`);
+        return data;
+        
+      } catch (error) {
+        console.warn(`SolanaRPC: Failed with ${rpcUrl}:`, error);
+        lastError = error as Error;
+        continue; // Try the next endpoint
+      }
     }
     
-    const data = await res.json();
-    
-    if (data.error) {
-      throw new Error(`RPC Error: ${data.error.message}`);
+    // If we get here, all endpoints failed
+    console.error('All Solana RPC endpoints failed');
+    throw lastError || new Error('All Solana RPC endpoints are unavailable');
+  } else {
+    // Client-side: use our API proxy
+    try {
+      console.log(`SolanaRPC: Making request to /api/solana with method ${method}`);
+      
+      const res = await fetch('/api/solana', {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body),
+        signal: AbortSignal.timeout(10000), // 10 second timeout
+      });
+      
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+      }
+      
+      const data = await res.json();
+      
+      if (data.error) {
+        throw new Error(`RPC Error: ${data.error.message}`);
+      }
+      
+      return data;
+    } catch (error) {
+      console.error(`Solana RPC call failed for method ${method}:`, error);
+      
+      // Provide more specific error messages
+      if (error instanceof TypeError && error.message === 'Failed to fetch') {
+        throw new Error('Network error: Unable to connect to Solana RPC endpoints. Please check your internet connection and try again.');
+      }
+      
+      if (error instanceof Error && error.name === 'AbortError') {
+        throw new Error('Request timeout: Solana RPC endpoints are taking too long to respond. Please try again later.');
+      }
+      
+      throw error;
     }
-    
-    return data;
-  } catch (error) {
-    console.error(`Solana RPC call failed for method ${method}:`, error);
-    
-    // Provide more specific error messages
-    if (error instanceof TypeError && error.message === 'Failed to fetch') {
-      throw new Error('Network error: Unable to connect to Solana RPC endpoints. Please check your internet connection and try again.');
-    }
-    
-    if (error instanceof Error && error.name === 'AbortError') {
-      throw new Error('Request timeout: Solana RPC endpoints are taking too long to respond. Please try again later.');
-    }
-    
-    throw error;
   }
 }
 
