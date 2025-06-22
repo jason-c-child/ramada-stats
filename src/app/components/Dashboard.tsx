@@ -9,9 +9,6 @@ import ValidatorStatsCard from './ValidatorStatsCard';
 import ChartsDashboard from './ChartsDashboard';
 import ControlPanel from './ControlPanel';
 import ValidatorExplorer from './ValidatorExplorer';
-import CrossChainAnalytics from './CrossChainAnalytics';
-import PrivacyMetrics from './PrivacyMetrics';
-import GovernanceDashboard from './GovernanceDashboard';
 import AlertSystem from './AlertSystem';
 
 interface NetworkStats {
@@ -36,9 +33,6 @@ export default function Dashboard() {
   
   // Component minimize/maximize states
   const [validatorExplorerMinimized, setValidatorExplorerMinimized] = useState(false);
-  const [crossChainAnalyticsMinimized, setCrossChainAnalyticsMinimized] = useState(false);
-  const [privacyMetricsMinimized, setPrivacyMetricsMinimized] = useState(false);
-  const [governanceDashboardMinimized, setGovernanceDashboardMinimized] = useState(false);
   const [alertSystemMinimized, setAlertSystemMinimized] = useState(false);
 
   useEffect(() => {
@@ -252,32 +246,32 @@ export default function Dashboard() {
                 {/* Charts Dashboard */}
                 <ChartsDashboard />
                 
-                {/* Phase 3 Advanced Analytics */}
-                <PrivacyMetrics
-                  isMinimized={privacyMetricsMinimized}
-                  onMinimize={() => setPrivacyMetricsMinimized(!privacyMetricsMinimized)}
-                />
-                
-                <GovernanceDashboard
-                  isMinimized={governanceDashboardMinimized}
-                  onMinimize={() => setGovernanceDashboardMinimized(!governanceDashboardMinimized)}
-                />
+                {/* Available Data Note */}
+                <div className="win95-window-inset p-4 mb-6">
+                  <h3 className="text-lg font-bold text-black mb-2">Available Data</h3>
+                  <div className="text-black text-sm">
+                    <p className="mb-2">This dashboard currently displays real-time data from Namada RPC endpoints:</p>
+                    <ul className="list-disc list-inside space-y-1 ml-4">
+                      <li>Network statistics (block height, epoch, validator count)</li>
+                      <li>Validator information and voting power</li>
+                      <li>Time series charts of network metrics</li>
+                      <li>Validator explorer with real validator data</li>
+                    </ul>
+                    <p className="mt-2 text-gray-600">
+                      Advanced features like governance, privacy metrics, and cross-chain analytics require additional APIs that are not currently available.
+                    </p>
+                  </div>
+                </div>
                 
                 <AlertSystem
                   isMinimized={alertSystemMinimized}
                   onMinimize={() => setAlertSystemMinimized(!alertSystemMinimized)}
                 />
                 
-                
                 {/* Phase 2 Components */}
                 <ValidatorExplorer
                   isMinimized={validatorExplorerMinimized}
                   onMinimize={() => setValidatorExplorerMinimized(!validatorExplorerMinimized)}
-                />
-                
-                <CrossChainAnalytics
-                  isMinimized={crossChainAnalyticsMinimized}
-                  onMinimize={() => setCrossChainAnalyticsMinimized(!crossChainAnalyticsMinimized)}
                 />
                 
                 {/* Control Panel */}
